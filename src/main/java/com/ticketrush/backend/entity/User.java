@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -15,30 +14,30 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    String email;
 
     @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+    String passwordHash;
 
     @Column(name = "full_name", nullable = false)
-    private String fullName;
+    String fullName;
 
     @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
+    LocalDate dateOfBirth;
 
     @Enumerated(EnumType.STRING)
-    private Gender gender;
+    Gender gender;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.CUSTOMER;
+    Role role = Role.CUSTOMER;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    LocalDateTime createdAt = LocalDateTime.now();
 
     public enum Gender { MALE, FEMALE, OTHER }
     public enum Role { CUSTOMER, ADMIN }
