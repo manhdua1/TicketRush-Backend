@@ -23,6 +23,8 @@ spring:
 
 server:
   port: 8080
+  servlet:
+    context-path: /api
 
 jwt:
   secret: ticketrush-super-secret-key-2026-change-this-in-production
