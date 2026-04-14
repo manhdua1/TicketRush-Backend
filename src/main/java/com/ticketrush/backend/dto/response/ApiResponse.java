@@ -1,6 +1,7 @@
 package com.ticketrush.backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.ticketrush.backend.exception.ErrorCode;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -15,4 +16,17 @@ public class ApiResponse<T> {
 
     String message;
     T result;
+
+    public static <T> ApiResponse<T> success(T result) {
+        return ApiResponse.<T>builder()
+                .result(result)
+                .build();
+    }
+
+    public static <T> ApiResponse<T> error(ErrorCode errorCode) {
+        return ApiResponse.<T>builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build();
+    }
 }
