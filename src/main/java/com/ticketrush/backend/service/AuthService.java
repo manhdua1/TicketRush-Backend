@@ -13,6 +13,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -35,6 +37,7 @@ public class AuthService {
                 .gender(request.getGender())
                 .passwordHash(passwordHashed)
                 .role(User.Role.CUSTOMER)
+                .createdAt(LocalDateTime.now())
                 .build();
 
         userRepository.save(user);
