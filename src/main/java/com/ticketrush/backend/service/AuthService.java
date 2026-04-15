@@ -1,0 +1,44 @@
+package com.ticketrush.backend.service;
+
+import com.ticketrush.backend.dto.request.RegisterRequest;
+import com.ticketrush.backend.dto.response.UserResponse;
+import com.ticketrush.backend.entity.User;
+import com.ticketrush.backend.exception.AppException;
+import com.ticketrush.backend.exception.ErrorCode;
+import com.ticketrush.backend.mapper.UserMapper;
+import com.ticketrush.backend.repository.UserRepository;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
+public class AuthService {
+    UserRepository userRepository;
+    PasswordEncoder passwordEncoder;
+    UserMapper userMapper;
+
+    public UserResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+
+        String passwordHashed = passwordEncoder.encode(request.getPassword());
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .fullName(request.getFullName())
+                .dateOfBirth(request.getDateOfBirth())
+                .gender(request.getGender())
+                .passwordHash(passwordHashed)
+                .role(User.Role.CUSTOMER)
+                .build();
+
+        userRepository.save(user);
+
+        return userMapper.toUserResponse(user);
+    }
+}
