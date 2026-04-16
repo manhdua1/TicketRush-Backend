@@ -5,20 +5,21 @@ import com.ticketrush.backend.dto.request.RegisterRequest;
 import com.ticketrush.backend.dto.response.ApiResponse;
 import com.ticketrush.backend.dto.response.AuthResponse;
 import com.ticketrush.backend.dto.response.UserResponse;
-import com.ticketrush.backend.entity.User;
-import com.ticketrush.backend.repository.UserRepository;
 import com.ticketrush.backend.service.AuthService;
-import io.jsonwebtoken.security.Password;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
+@Tag(name = "Authentication", description = "Đăng ký và đăng nhập")
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/auth")
@@ -26,13 +27,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     AuthService authService;
 
+    @Operation(summary = "Đăng ký tài khoản mới")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Đăng ký thành công"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Email đã tồn tại")
+    })
     @PostMapping("/register")
     public ApiResponse<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ApiResponse.success(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ApiResponse<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ApiResponse.success(authService.login(request));
     }
 }
