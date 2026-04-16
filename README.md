@@ -25,3 +25,6 @@ Once you see the message Started TicketrushBackendApplication, the system is rea
 To stop the system:
 
 `docker compose down`
+
+## API Documentation
+Swagger UI: http://localhost:8080/swagger-ui.html
