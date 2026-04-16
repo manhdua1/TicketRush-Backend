@@ -29,3 +29,10 @@ server:
 jwt:
   secret: ticketrush-super-secret-key-2026-change-this-in-production
   expiration: 86400000
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
