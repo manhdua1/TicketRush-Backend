@@ -1,6 +1,8 @@
 package com.ticketrush.backend.service;
 
 import com.ticketrush.backend.entity.User;
+import com.ticketrush.backend.exception.AppException;
+import com.ticketrush.backend.exception.ErrorCode;
 import com.ticketrush.backend.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())

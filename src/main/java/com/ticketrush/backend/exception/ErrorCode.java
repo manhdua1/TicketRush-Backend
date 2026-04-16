@@ -16,7 +16,8 @@ public enum ErrorCode {
     EMAIL_REQUIRED(1004, "Email không được để trống", HttpStatus.BAD_REQUEST),
     INVALID_EMAIL(1005, "Email không đúng định dạng", HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD(1006, "Mật khẩu chỉ trong khoảng 6 đến 20 kí tự", HttpStatus.BAD_REQUEST),
-    INVALID_KEY(1007, "Lỗi không xác định", HttpStatus.INTERNAL_SERVER_ERROR)
+    INVALID_KEY(1007, "Lỗi không xác định", HttpStatus.INTERNAL_SERVER_ERROR),
+    USER_NOT_FOUND(1008, "Người dùng không tồn tại", HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
