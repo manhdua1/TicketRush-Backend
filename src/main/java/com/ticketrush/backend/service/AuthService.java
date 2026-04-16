@@ -1,6 +1,8 @@
 package com.ticketrush.backend.service;
 
+import com.ticketrush.backend.dto.request.LoginRequest;
 import com.ticketrush.backend.dto.request.RegisterRequest;
+import com.ticketrush.backend.dto.response.AuthResponse;
 import com.ticketrush.backend.dto.response.UserResponse;
 import com.ticketrush.backend.entity.User;
 import com.ticketrush.backend.exception.AppException;
@@ -22,6 +24,7 @@ public class AuthService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     UserMapper userMapper;
+    JwtService jwtService;
 
     public UserResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -43,5 +46,24 @@ public class AuthService {
         userRepository.save(user);
 
         return userMapper.toUserResponse(user);
+    }
+
+    public AuthResponse login(LoginRequest request) {
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIALS));
+
+        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPasswordHash());
+
+
+
+        if (!authenticated)
+            throw new AppException(ErrorCode.INVALID_CREDENTIALS);
+
+        var token = jwtService.generateToken(user);
+
+        return AuthResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
     }
 }

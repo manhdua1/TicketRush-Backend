@@ -1,7 +1,9 @@
 package com.ticketrush.backend.controller;
 
+import com.ticketrush.backend.dto.request.LoginRequest;
 import com.ticketrush.backend.dto.request.RegisterRequest;
 import com.ticketrush.backend.dto.response.ApiResponse;
+import com.ticketrush.backend.dto.response.AuthResponse;
 import com.ticketrush.backend.dto.response.UserResponse;
 import com.ticketrush.backend.entity.User;
 import com.ticketrush.backend.repository.UserRepository;
@@ -23,10 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
     AuthService authService;
-    PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
     public ApiResponse<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ApiResponse.success(authService.register(request));
+    }
+
+    @PostMapping("/login")
+    public ApiResponse<AuthResponse> login(@RequestBody LoginRequest request) {
+        return ApiResponse.success(authService.login(request));
     }
 }
