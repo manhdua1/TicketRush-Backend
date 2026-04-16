@@ -27,7 +27,7 @@ server:
     context-path: /api
 
 jwt:
-  secret: ticketrush-super-secret-key-2026-change-this-in-production
+  secret: c0015e35ed778f66e55716f375879ebc69c06e356760f7a6c7fb69494b6dab25
   expiration: 86400000
 
 springdoc:
