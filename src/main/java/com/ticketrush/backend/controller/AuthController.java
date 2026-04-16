@@ -22,15 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Authentication", description = "Đăng ký và đăng nhập")
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
     AuthService authService;
 
     @Operation(summary = "Đăng ký tài khoản mới")
     @io.swagger.v3.oas.annotations.responses.ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Đăng ký thành công"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Email đã tồn tại")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1000", description = "Đăng ký thành công"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1001", description = "Email đã được sử dụng"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1003", description = "Họ và tên không được để trống"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1004", description = "Email không được để trống"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1005", description = "Email không đúng định dạng"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1006", description = "Mật khẩu chỉ trong khoảng 6 đến 20 kí tự"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "9999", description = "Lỗi không xác định")
     })
     @PostMapping("/register")
     public ApiResponse<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
