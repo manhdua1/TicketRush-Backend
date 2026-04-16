@@ -42,7 +42,12 @@ public class AuthController {
         return ApiResponse.success(authService.register(request));
     }
 
+    @Operation(summary = "Đăng nhập vào tài khoản và nhận jwt")
     @PostMapping("/login")
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1000", description = "Đăng ký thành công"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1002", description = "Email hoặc mật khẩu sai")
+    })
     public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ApiResponse.success(authService.login(request));
     }
