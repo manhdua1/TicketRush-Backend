@@ -24,7 +24,7 @@ public class RegisterRequest {
     @NotBlank @Size(min = 6, max = 20, message = "INVALID_PASSWORD")
     private String password;
 
-    @PastOrPresent
+    @PastOrPresent(message = "INVALID_DOB")
     private LocalDate dateOfBirth;
 
     private User.Gender gender;

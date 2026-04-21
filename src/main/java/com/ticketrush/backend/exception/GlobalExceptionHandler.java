@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -42,6 +43,12 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = exception.getErrorCode();
         ApiResponse<?> apiResponse = ApiResponse.error(errorCode);
         return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
+    }
+
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    ResponseEntity<ApiResponse<?>> handlingHttpMessageNotReadbleException(HttpMessageNotReadableException exception) {
+        ErrorCode errorCode = ErrorCode.INVALID_GENDER;
+        return ResponseEntity.status(errorCode.getStatusCode()).body(ApiResponse.error(errorCode));
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
