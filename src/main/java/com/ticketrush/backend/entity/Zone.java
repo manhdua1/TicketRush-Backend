@@ -34,4 +34,10 @@ public class Zone {
 
     @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL)
     List<Seat> seats = new ArrayList<>();
+
+    @Column(name = "total_rows")
+    Integer totalRows;
+
+    @Column(name = "total_cols")
+    Integer totalCols;
 }
