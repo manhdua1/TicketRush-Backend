@@ -24,7 +24,8 @@ public enum ErrorCode {
     TITLE_REQUIRED(1013, "Tên sự kiện không được để trống", HttpStatus.BAD_REQUEST),
     VENUE_REQUIRED(1014, "Địa điểm không được để trống", HttpStatus.BAD_REQUEST),
     EVENT_DATE_REQUIRED(1015, "Ngày sự kiện không được để trống", HttpStatus.BAD_REQUEST),
-    INVALID_EVENT_DATE(1016, "Ngày sự kiện phải ở tương lai", HttpStatus.BAD_REQUEST)
+    INVALID_EVENT_DATE(1016, "Ngày sự kiện phải ở tương lai", HttpStatus.BAD_REQUEST),
+    EVENT_NOT_FOUND(1017, "Sự kiện không tồn tại", HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

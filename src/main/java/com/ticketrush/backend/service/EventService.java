@@ -15,6 +15,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -38,6 +40,34 @@ public class EventService {
                 .build();
 
         eventRepository.save(event);
+        return eventMapper.toEventResponse(event);
+    }
+
+    public EventResponse updateEvent(EventRequest request, Integer eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_FOUND));
+
+        event.setTitle(request.getTitle());
+        event.setDescription(request.getDescription());
+        event.setVenue(request.getVenue());
+        event.setEventDate(request.getEventDate());
+        event.setPosterUrl(request.getPosterUrl());
+
+        eventRepository.save(event);
+        return eventMapper.toEventResponse(event);
+    }
+
+    public List<EventResponse> getOnSaleEvents() {
+        return eventRepository.findByStatusOrderByEventDateAsc(Event.Status.ON_SALE)
+                .stream()
+                .map(eventMapper::toEventResponse)
+                .toList();
+    }
+
+    public EventResponse getEventById(Integer eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_FOUND));
+
         return eventMapper.toEventResponse(event);
     }
 }
