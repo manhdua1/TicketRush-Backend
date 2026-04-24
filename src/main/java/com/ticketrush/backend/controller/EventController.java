@@ -16,6 +16,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/api")
@@ -44,5 +46,15 @@ public class EventController {
     ) {
        EventResponse eventResponse = eventService.updateEvent(request, id);
        return ApiResponse.success(eventResponse);
+    }
+
+    @GetMapping("/events")
+    public ApiResponse<List<EventResponse>> getOnSaleEvents() {
+        return ApiResponse.success(eventService.getOnSaleEvents());
+    }
+
+    @GetMapping("/events/{id}")
+    public ApiResponse<EventResponse> getEventById(@PathVariable Integer id) {
+        return ApiResponse.success(eventService.getEventById(id));
     }
 }
