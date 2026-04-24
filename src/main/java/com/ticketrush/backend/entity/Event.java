@@ -43,10 +43,10 @@ public class Event {
     User createdBy;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-    private List<Zone> zones = new ArrayList<>();
+    List<Zone> zones = new ArrayList<>();
 
     public enum Status { DRAFT, ON_SALE, ENDED }
 }
