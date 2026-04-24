@@ -10,9 +10,9 @@ import lombok.experimental.FieldDefaults;
 @Getter @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LoginRequest {
-    @Email @NotBlank
+    @Email(message = "INVALID_EMAIL") @NotBlank(message = "EMAIL_REQUIRED")
     String email;
 
-    @NotBlank
+    @NotBlank(message = "PASSWORD_REQUIRED")
     String password;
 }

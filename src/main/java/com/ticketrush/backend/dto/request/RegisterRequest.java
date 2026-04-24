@@ -21,7 +21,7 @@ public class RegisterRequest {
     @Email(message = "INVALID_EMAIL") @NotBlank(message = "EMAIL_REQUIRED")
     private String email;
 
-    @NotBlank @Size(min = 6, max = 20, message = "INVALID_PASSWORD")
+    @NotBlank(message = "PASSWORD_REQUIRED") @Size(min = 6, max = 20, message = "INVALID_PASSWORD")
     private String password;
 
     @PastOrPresent(message = "INVALID_DOB")

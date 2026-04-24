@@ -19,7 +19,12 @@ public enum ErrorCode {
     INVALID_KEY(1007, "Lỗi không xác định", HttpStatus.INTERNAL_SERVER_ERROR),
     USER_NOT_FOUND(1008, "Người dùng không tồn tại", HttpStatus.BAD_REQUEST),
     INVALID_GENDER(1009, "Gender chỉ được 1 trong 3 giá trị: MALE, FEMALE và OTHHER", HttpStatus.BAD_REQUEST),
-    INVALID_DOB(1011, "Ngày sinh chỉ ở hiện tại hoặc quá khứ", HttpStatus.BAD_REQUEST)
+    INVALID_DOB(1011, "Ngày sinh chỉ ở hiện tại hoặc quá khứ", HttpStatus.BAD_REQUEST),
+    PASSWORD_REQUIRED(1012, "Mật khẩu không được để trống", HttpStatus.BAD_REQUEST),
+    TITLE_REQUIRED(1013, "Tên sự kiện không được để trống", HttpStatus.BAD_REQUEST),
+    VENUE_REQUIRED(1014, "Địa điểm không được để trống", HttpStatus.BAD_REQUEST),
+    EVENT_DATE_REQUIRED(1015, "Ngày sự kiện không được để trống", HttpStatus.BAD_REQUEST),
+    INVALID_EVENT_DATE(1016, "Ngày sự kiện phải ở tương lai", HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
