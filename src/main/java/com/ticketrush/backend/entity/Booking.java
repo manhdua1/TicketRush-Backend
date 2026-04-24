@@ -2,6 +2,7 @@ package com.ticketrush.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,38 +13,39 @@ import java.util.List;
 @Table(name = "bookings")
 @Getter @Setter @Builder
 @NoArgsConstructor @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
-    private Event event;
+    Event event;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status = Status.PENDING;
+    Status status = Status.PENDING;
 
     @Column(name = "total_amount", precision = 12, scale = 0)
-    private BigDecimal totalAmount;
+    BigDecimal totalAmount;
 
     @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
+    LocalDateTime expiresAt;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
-    private List<BookingSeat> bookingSeats = new ArrayList<>();
+    List<BookingSeat> bookingSeats = new ArrayList<>();
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
-    private List<Ticket> tickets = new ArrayList<>();
+    List<Ticket> tickets = new ArrayList<>();
 
     public enum Status { PENDING, CONFIRMED, EXPIRED, CANCELLED }
 }
