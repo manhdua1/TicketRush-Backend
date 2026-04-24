@@ -25,7 +25,15 @@ public enum ErrorCode {
     VENUE_REQUIRED(1014, "Địa điểm không được để trống", HttpStatus.BAD_REQUEST),
     EVENT_DATE_REQUIRED(1015, "Ngày sự kiện không được để trống", HttpStatus.BAD_REQUEST),
     INVALID_EVENT_DATE(1016, "Ngày sự kiện phải ở tương lai", HttpStatus.BAD_REQUEST),
-    EVENT_NOT_FOUND(1017, "Sự kiện không tồn tại", HttpStatus.BAD_REQUEST)
+    EVENT_NOT_FOUND(1017, "Sự kiện không tồn tại", HttpStatus.BAD_REQUEST),
+    ZONE_NAME_REQUIRED(1018, "Tên khu vực không được để trống", HttpStatus.BAD_REQUEST),
+    PRICE_REQUIRED(1019, "Giá vé không được để trống", HttpStatus.BAD_REQUEST),
+    INVALID_PRICE(1020, "Giá vé phải là một số dương (> 0)", HttpStatus.BAD_REQUEST),
+    TOTAL_ROWS_REQUIRED(1021, "Tổng số hàng không được để trống", HttpStatus.BAD_REQUEST),
+    INVALID_ROWS(1022, "Tổng số hàng phải từ 1 đến 50", HttpStatus.BAD_REQUEST),
+    TOTAL_COLS_REQUIRED(1023, "Tổng số cột không được để trống", HttpStatus.BAD_REQUEST),
+    INVALID_COLS(1024, "Tổng số cột phải từ 1 đến 50", HttpStatus.BAD_REQUEST),
+    INVALID_COLOR(1025, "Mã màu không đúng định dạng Hex (VD: #FFFFFF)", HttpStatus.BAD_REQUEST);
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
