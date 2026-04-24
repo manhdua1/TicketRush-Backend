@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -38,5 +35,14 @@ public class EventController {
         EventResponse eventResponse = eventService.createEvent(request, adminId);
 
         return ApiResponse.success(eventResponse);
+    }
+
+    @PutMapping("/admin/events/{id}")
+    public ApiResponse<EventResponse> updateEvent(
+            @PathVariable Integer id,
+            @Valid @RequestBody EventRequest request
+    ) {
+       EventResponse eventResponse = eventService.updateEvent(request, id);
+       return ApiResponse.success(eventResponse);
     }
 }

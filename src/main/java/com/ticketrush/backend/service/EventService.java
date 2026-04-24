@@ -40,4 +40,18 @@ public class EventService {
         eventRepository.save(event);
         return eventMapper.toEventResponse(event);
     }
+
+    public EventResponse updateEvent(EventRequest request, Integer eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_FOUND));
+
+        event.setTitle(request.getTitle());
+        event.setDescription(request.getDescription());
+        event.setVenue(request.getVenue());
+        event.setEventDate(request.getEventDate());
+        event.setPosterUrl(request.getPosterUrl());
+
+        eventRepository.save(event);
+        return eventMapper.toEventResponse(event);
+    }
 }
