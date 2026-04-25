@@ -28,15 +28,6 @@ public class AuthController {
     AuthService authService;
 
     @Operation(summary = "Đăng ký tài khoản mới")
-    @io.swagger.v3.oas.annotations.responses.ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1000", description = "Đăng ký thành công"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1001", description = "Email đã được sử dụng"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1003", description = "Họ và tên không được để trống"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1004", description = "Email không được để trống"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1005", description = "Email không đúng định dạng"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1006", description = "Mật khẩu chỉ trong khoảng 6 đến 20 kí tự"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "9999", description = "Lỗi không xác định")
-    })
     @PostMapping("/register")
     public ApiResponse<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ApiResponse.success(authService.register(request));
@@ -44,10 +35,6 @@ public class AuthController {
 
     @Operation(summary = "Đăng nhập vào tài khoản và nhận jwt")
     @PostMapping("/login")
-    @io.swagger.v3.oas.annotations.responses.ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1000", description = "Đăng ký thành công"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "1002", description = "Email hoặc mật khẩu sai")
-    })
     public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ApiResponse.success(authService.login(request));
     }
