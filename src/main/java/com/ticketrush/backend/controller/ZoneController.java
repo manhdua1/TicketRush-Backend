@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Zone", description = "Quản lý khu vực ghế")
+@Tag(name = "Zones", description = "Quản lý khu vực ghế")
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
