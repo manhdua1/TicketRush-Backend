@@ -38,7 +38,8 @@ public enum ErrorCode {
     SEAT_NOT_FOUND(1026, "Ghế không tồn tại", HttpStatus.BAD_REQUEST),
     SEAT_UNAVAILABLE(1027, "Ghế không khả dụng", HttpStatus.BAD_REQUEST),
     BOOKING_NOT_FOUND(1028, "Không tìm thấy thông tin đặt chỗ", HttpStatus.BAD_REQUEST),
-    BOOKING_EXPIRED(1029, "Thông tin đặt chỗ đã hết hạn", HttpStatus.BAD_REQUEST)
+    BOOKING_EXPIRED(1029, "Thông tin đặt chỗ đã hết hạn", HttpStatus.BAD_REQUEST),
+    TICKET_NOT_FOUND(1030, "Không tìm thấy vé", HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
