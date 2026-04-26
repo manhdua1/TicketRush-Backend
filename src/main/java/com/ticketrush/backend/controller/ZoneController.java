@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Zones", description = "Quản lý khu vực ghế")
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ZoneController {
     ZoneService zoneService;
 
     @Operation(summary = "Tạo khu vực ghế cho sự kiện")
-    @PostMapping("/events/{eventId}/zones")
+    @PostMapping("/admin/events/{eventId}/zones")
     public ApiResponse<ZoneResponse> createZone(
             @PathVariable Integer eventId,
             @Valid @RequestBody ZoneRequest request) {

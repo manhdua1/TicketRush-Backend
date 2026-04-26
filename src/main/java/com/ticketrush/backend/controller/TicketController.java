@@ -28,7 +28,7 @@ public class TicketController {
     UserRepository userRepository;
 
     @Operation(summary = "Danh sách vé của tôi")
-    @GetMapping("/api/my/tickets")
+    @GetMapping("/myTickets")
     public ApiResponse<List<TicketResponse>> getMyTickets(
             @AuthenticationPrincipal UserDetails userDetails) {
         Integer userId = userRepository.findByEmail(userDetails.getUsername())
@@ -38,7 +38,7 @@ public class TicketController {
     }
 
     @Operation(summary = "Xem chi tiết vé theo QR Code")
-    @GetMapping("/api/tickets/{qrCode}")
+    @GetMapping("/tickets/{qrCode}")
     public ApiResponse<TicketResponse> getTicketByQrCode(
             @PathVariable String qrCode) {
         return ApiResponse.success(ticketService.getTicketByQrCode(qrCode));
