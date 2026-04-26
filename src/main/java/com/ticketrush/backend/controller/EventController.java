@@ -67,7 +67,7 @@ public class EventController {
     }
 
     @Operation(summary = "Thay đổi trạng thái sự kiện (Admin)")
-    @PatchMapping("/api/admin/events/{id}/status")
+    @PatchMapping("/admin/events/{id}/status")
     public ApiResponse<EventResponse> changeStatus(
             @PathVariable Integer id,
             @Valid @RequestBody EventStatusRequest request) {
