@@ -70,4 +70,13 @@ public class EventService {
 
         return eventMapper.toEventResponse(event);
     }
+
+    public EventResponse changeStatus(Integer id, Event.Status status) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_FOUND));
+
+        event.setStatus(status);
+        eventRepository.save(event);
+        return eventMapper.toEventResponse(event);
+    }
 }

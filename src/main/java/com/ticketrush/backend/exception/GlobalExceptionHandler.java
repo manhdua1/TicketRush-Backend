@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     ResponseEntity<ApiResponse<?>> handlingHttpMessageNotReadbleException(HttpMessageNotReadableException exception) {
-        ErrorCode errorCode = ErrorCode.INVALID_GENDER;
+        ErrorCode errorCode = ErrorCode.INVALID_ENUM;
         return ResponseEntity.status(errorCode.getStatusCode()).body(ApiResponse.error(errorCode));
     }
 
