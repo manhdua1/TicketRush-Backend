@@ -19,6 +19,7 @@ public class EventResponse {
     LocalDateTime eventDate;
     String posterUrl;
     String status;
+    String type;
     List<ZoneResponse> zones;
     LocalDateTime createdAt;
 }

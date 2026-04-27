@@ -36,6 +36,7 @@ public class EventService {
                 .eventDate(request.getEventDate())
                 .posterUrl(request.getPosterUrl())
                 .status(Event.Status.DRAFT)
+                .type(request.getType())
                 .createdBy(admin)
                 .build();
 
@@ -52,6 +53,7 @@ public class EventService {
         event.setVenue(request.getVenue());
         event.setEventDate(request.getEventDate());
         event.setPosterUrl(request.getPosterUrl());
+        event.setType(request.getType());
 
         eventRepository.save(event);
         return eventMapper.toEventResponse(event);

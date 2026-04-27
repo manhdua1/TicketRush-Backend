@@ -48,5 +48,18 @@ public class Event {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     List<Zone> zones = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    Type type;
+
     public enum Status { DRAFT, ON_SALE, ENDED }
+
+    public enum Type {
+        LIVE_MUSIC,
+        PERFORMING_ARTS,
+        SPORTS,
+        SEMINARS_AND_WORKSHOPS,
+        TOURS_AND_EXPERIENCES,
+        OTHER
+    }
 }

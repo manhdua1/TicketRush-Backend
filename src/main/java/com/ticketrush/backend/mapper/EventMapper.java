@@ -11,5 +11,6 @@ import org.mapstruct.Mapping;
 public interface EventMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(source = "zones", target = "zones")
+    @Mapping(source = "type", target = "type")
     EventResponse toEventResponse(Event event);
 }

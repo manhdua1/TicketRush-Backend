@@ -1,5 +1,6 @@
 package com.ticketrush.backend.dto.request;
 
+import com.ticketrush.backend.entity.Event;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,16 +16,19 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventRequest {
     @NotBlank(message = "TITLE_REQUIRED")
-    private String title;
+    String title;
 
-    private String description;
+    String description;
 
     @NotBlank(message = "VENUE_REQUIRED")
-    private String venue;
+    String venue;
 
     @NotNull(message = "EVENT_DATE_REQUIRED")
     @Future(message = "INVALID_EVENT_DATE")
-    private LocalDateTime eventDate;
+    LocalDateTime eventDate;
 
-    private String posterUrl;
+    @NotNull(message = "EVENT_TYPE_REQUIRED")
+    Event.Type type;
+
+    String posterUrl;
 }
