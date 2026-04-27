@@ -1,6 +1,6 @@
 package com.ticketrush.backend.config;
 
-import com.ticketrush.backend.service.JwtService;
+import com.ticketrush.backend.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
