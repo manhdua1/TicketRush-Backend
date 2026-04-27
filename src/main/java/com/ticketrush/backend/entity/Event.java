@@ -6,7 +6,9 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "events")
@@ -46,7 +48,7 @@ public class Event {
     LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-    List<Zone> zones = new ArrayList<>();
+    Set<Zone> zones = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
