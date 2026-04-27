@@ -66,7 +66,6 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .token(token)
-                .authenticated(true)
                 .build();
     }
 }
