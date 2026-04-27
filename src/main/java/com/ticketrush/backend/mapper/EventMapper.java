@@ -7,9 +7,10 @@ import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {ZoneMapper.class})
 public interface EventMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(source = "zones", target = "zones")
+    @Mapping(source = "type", target = "type")
     EventResponse toEventResponse(Event event);
 }

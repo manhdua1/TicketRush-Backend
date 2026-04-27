@@ -55,7 +55,7 @@ public class EventController {
     }
 
     @Operation(summary = "Lấy sự kiện đang mở bán")
-    @GetMapping("/events")
+    @GetMapping("/events/on-sale")
     public ApiResponse<List<EventResponse>> getOnSaleEvents() {
         return ApiResponse.success(eventService.getOnSaleEvents());
     }
@@ -72,5 +72,11 @@ public class EventController {
             @PathVariable Integer id,
             @Valid @RequestBody EventStatusRequest request) {
         return ApiResponse.success(eventService.changeStatus(id, request.getStatus()));
+    }
+
+    @Operation(summary = "Lấy sự kiện theo thể loại")
+    @GetMapping("/events/by-type")
+    public ApiResponse<List<EventResponse>> getEventsByType(@Valid @RequestParam Event.Type type) {
+        return ApiResponse.success(eventService.getEventByType(type));
     }
 }

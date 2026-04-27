@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 public interface ZoneMapper {
     @Mapping(target = "totalSeats",
             expression = "java(zone.getTotalRows() != null && zone.getTotalCols() != null ? (long) zone.getTotalRows() * zone.getTotalCols() : 0L)")
-    @Mapping(target = "availableSeats", ignore = true)
+    @Mapping(target = "availableSeats",
+            expression = "java(zone.getSeats() != null ? zone.getSeats().stream().filter(s -> s.getStatus() == com.ticketrush.backend.entity.Seat.Status.AVAILABLE).count() : 0L)")
     ZoneResponse toZoneResponse(Zone zone);
 }

@@ -6,7 +6,9 @@ import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "zones")
@@ -33,7 +35,7 @@ public class Zone {
     String colorHex;
 
     @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL)
-    List<Seat> seats = new ArrayList<>();
+    Set<Seat> seats = new HashSet<>();
 
     @Column(name = "total_rows")
     Integer totalRows;

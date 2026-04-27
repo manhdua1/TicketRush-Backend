@@ -1,10 +1,7 @@
 package com.ticketrush.backend.dto.request;
 
 import com.ticketrush.backend.entity.User;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,5 +24,6 @@ public class RegisterRequest {
     @PastOrPresent(message = "INVALID_DOB")
     private LocalDate dateOfBirth;
 
+    @NotNull(message = "GENDER_REQUIRED")
     private User.Gender gender;
 }
