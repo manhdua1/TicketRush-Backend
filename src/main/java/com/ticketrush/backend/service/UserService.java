@@ -1,5 +1,6 @@
 package com.ticketrush.backend.service;
 
+import com.ticketrush.backend.dto.request.UserUpdateRequest;
 import com.ticketrush.backend.dto.response.UserResponse;
 import com.ticketrush.backend.entity.User;
 import com.ticketrush.backend.exception.AppException;
@@ -22,6 +23,19 @@ public class UserService {
     public UserResponse getMyInfo(UserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        return userMapper.toUserResponse(user);
+    }
+
+    public UserResponse updateMyInfo(UserUpdateRequest request, UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        user.setFullName(request.getFullName());
+        user.setGender(request.getGender());
+        user.setDateOfBirth(request.getDateOfBirth());
+
+        userRepository.save(user);
 
         return userMapper.toUserResponse(user);
     }
