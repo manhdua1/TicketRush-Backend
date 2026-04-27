@@ -1,4 +1,4 @@
-package com.ticketrush.backend.service;
+package com.ticketrush.backend.security;
 
 import com.ticketrush.backend.entity.User;
 import io.jsonwebtoken.Claims;

@@ -9,6 +9,7 @@ import com.ticketrush.backend.exception.AppException;
 import com.ticketrush.backend.exception.ErrorCode;
 import com.ticketrush.backend.mapper.UserMapper;
 import com.ticketrush.backend.repository.UserRepository;
+import com.ticketrush.backend.security.JwtService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
