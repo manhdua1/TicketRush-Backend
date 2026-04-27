@@ -40,7 +40,7 @@ public class AuthController {
 
     @Operation(summary = "Đăng nhập vào tài khoản và nhận jwt")
     @PostMapping("/login")
-    public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request,
+    public ApiResponse<Void> login(@Valid @RequestBody LoginRequest request,
                                            HttpServletResponse response) {
         AuthResponse auth = authService.login(request);
 
@@ -48,10 +48,26 @@ public class AuthController {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(Duration.ofHours(1))
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+
+        return ApiResponse.success(null);
+    }
+
+    @Operation(summary = "Đăng xuất")
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(HttpServletResponse response) {
+
+        ResponseCookie deleteCookie = ResponseCookie.from("access_token", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
         return ApiResponse.success(null);
     }
