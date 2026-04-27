@@ -81,4 +81,11 @@ public class EventService {
         eventRepository.save(event);
         return eventMapper.toEventResponse(event);
     }
+
+    public List<EventResponse> getEventByType(Event.Type type) {
+        List<Event> events = eventRepository.findByTypeOrderByEventDateAsc(type);
+        return events.stream()
+                .map(eventMapper::toEventResponse)
+                .toList();
+    }
 }

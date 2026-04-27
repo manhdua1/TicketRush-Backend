@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 
 @Getter @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EventStatusRequest {
+public class EventTypeRequest {
     @NotNull
-    Event.Status status;
+    Event.Type type;
 }

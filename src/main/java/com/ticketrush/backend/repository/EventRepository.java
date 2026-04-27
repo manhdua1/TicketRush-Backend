@@ -14,4 +14,6 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
     @Query("SELECT e FROM Event e LEFT JOIN FETCH e.zones WHERE e.id = :id")
     Optional<Event> findByIdWithZones(Integer id);
+
+    List<Event> findByTypeOrderByEventDateAsc(Event.Type type);
 }
