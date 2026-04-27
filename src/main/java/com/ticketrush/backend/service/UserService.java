@@ -9,6 +9,7 @@ import com.ticketrush.backend.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,8 +19,8 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
 
-    public UserResponse getUserById(Integer id) {
-        User user = userRepository.findById(id)
+    public UserResponse getMyInfo(UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         return userMapper.toUserResponse(user);
