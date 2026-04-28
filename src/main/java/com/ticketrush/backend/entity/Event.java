@@ -30,8 +30,11 @@ public class Event {
     @Column(nullable = false)
     String venue;
 
-    @Column(name = "event_date", nullable = false)
-    LocalDateTime eventDate;
+    @Column(name = "start_time", nullable = false)
+    LocalDateTime startTime;
+
+    @Column(name = "end_time", nullable = false)
+    LocalDateTime endTime;
 
     @Column(name = "poster_url")
     String posterUrl;
