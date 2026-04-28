@@ -40,7 +40,10 @@ public enum ErrorCode {
     SEAT_UNAVAILABLE(1027, "Ghế không khả dụng", HttpStatus.BAD_REQUEST),
     BOOKING_NOT_FOUND(1028, "Không tìm thấy thông tin đặt chỗ", HttpStatus.BAD_REQUEST),
     BOOKING_EXPIRED(1029, "Thông tin đặt chỗ đã hết hạn", HttpStatus.BAD_REQUEST),
-    TICKET_NOT_FOUND(1030, "Không tìm thấy vé", HttpStatus.BAD_REQUEST)
+    TICKET_NOT_FOUND(1030, "Không tìm thấy vé", HttpStatus.BAD_REQUEST),
+    FILE_EMPTY(1031, "File không được rỗng", HttpStatus.BAD_REQUEST),
+    INVALID_FILE_TYPE(1032, "Chỉ chấp nhận file ảnh", HttpStatus.BAD_REQUEST),
+    UPLOAD_FAILED(1033, "Upload ảnh thất bại", HttpStatus.INTERNAL_SERVER_ERROR)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

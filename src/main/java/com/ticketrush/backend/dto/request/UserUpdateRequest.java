@@ -14,11 +14,11 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
     @NotBlank(message = "FULLNAME_REQUIRED")
-    private String fullName;
+    String fullName;
 
     @PastOrPresent(message = "INVALID_DOB")
-    private LocalDate dateOfBirth;
+    LocalDate dateOfBirth;
 
     @NotNull(message = "GENDER_REQUIRED")
-    private User.Gender gender;
+    User.Gender gender;
 }

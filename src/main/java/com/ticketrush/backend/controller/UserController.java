@@ -9,9 +9,11 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Users", description = "Quản lý người dùng")
 @RestController
@@ -31,5 +33,12 @@ public class UserController {
     public ApiResponse<UserResponse> updateMyInfo(@Valid @RequestBody UserUpdateRequest request,
                                                   @AuthenticationPrincipal UserDetails userDetails) {
         return ApiResponse.success(userService.updateMyInfo(request, userDetails));
+    }
+
+    @PostMapping(value = "/my-info/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<UserResponse> uploadAvatar(
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ApiResponse.success(userService.uploadAvatar(file, userDetails));
     }
 }
