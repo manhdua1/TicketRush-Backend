@@ -4,7 +4,10 @@ import com.ticketrush.backend.dto.request.LoginRequest;
 import com.ticketrush.backend.dto.request.RegisterRequest;
 import com.ticketrush.backend.dto.response.ApiResponse;
 import com.ticketrush.backend.dto.response.AuthResponse;
+import com.ticketrush.backend.dto.response.UserDetailsResponse;
 import com.ticketrush.backend.dto.response.UserResponse;
+import com.ticketrush.backend.exception.AppException;
+import com.ticketrush.backend.exception.ErrorCode;
 import com.ticketrush.backend.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -16,12 +19,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
+import java.util.List;
 
 
 @Tag(name = "Authentication", description = "Đăng ký và đăng nhập")
@@ -70,5 +73,11 @@ public class AuthController {
         response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
         return ApiResponse.success(null);
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<UserDetailsResponse> getMe(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) throw new AppException(ErrorCode.UNAUTHENTICATED);
+        return ApiResponse.success(authService.getMe(userDetails));
     }
 }
