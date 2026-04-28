@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
+    CloudinaryService cloudinaryService;
 
     public UserResponse getMyInfo(UserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername())
@@ -35,6 +37,24 @@ public class UserService {
         user.setGender(request.getGender());
         user.setDateOfBirth(request.getDateOfBirth());
 
+        userRepository.save(user);
+
+        return userMapper.toUserResponse(user);
+    }
+
+    public UserResponse uploadAvatar(MultipartFile file, UserDetails userDetails) {
+        if (file.isEmpty())
+            throw new AppException(ErrorCode.FILE_EMPTY);
+
+        if (!file.getContentType().startsWith("image/"))
+            throw new AppException(ErrorCode.INVALID_FILE_TYPE);
+
+        String avatarUrl = cloudinaryService.uploadAvatar(file);
+
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        user.setAvatarUrl(avatarUrl);
         userRepository.save(user);
 
         return userMapper.toUserResponse(user);

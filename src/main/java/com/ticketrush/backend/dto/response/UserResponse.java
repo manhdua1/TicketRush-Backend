@@ -18,5 +18,6 @@ public class UserResponse {
     LocalDate dateOfBirth;
     User.Gender gender;
     User.Role role;
+    String avatarUrl;
     LocalDateTime createdAt;
 }
