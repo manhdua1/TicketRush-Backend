@@ -3,6 +3,7 @@ package com.ticketrush.backend.service;
 import com.ticketrush.backend.dto.request.LoginRequest;
 import com.ticketrush.backend.dto.request.RegisterRequest;
 import com.ticketrush.backend.dto.response.AuthResponse;
+import com.ticketrush.backend.dto.response.UserDetailsResponse;
 import com.ticketrush.backend.dto.response.UserResponse;
 import com.ticketrush.backend.entity.User;
 import com.ticketrush.backend.exception.AppException;
@@ -14,6 +15,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -66,6 +69,18 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .token(token)
+                .build();
+    }
+
+    public UserDetailsResponse getMe(UserDetails userDetails) {
+        String role = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse(null);
+
+        return UserDetailsResponse.builder()
+                .email(userDetails.getUsername())
+                .role(role)
                 .build();
     }
 }

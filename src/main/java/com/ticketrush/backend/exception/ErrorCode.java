@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatusCode;
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Lỗi không xác định", HttpStatus.INTERNAL_SERVER_ERROR),
     UNAUTHORIZED(8888, "Không có quyền", HttpStatus.FORBIDDEN),
+    UNAUTHENTICATED(7777, "Chưa đăng nhập", HttpStatus.UNAUTHORIZED),
     EMAIL_EXISTED(1001, "Email đã được sử dụng", HttpStatus.BAD_REQUEST),
     INVALID_CREDENTIALS(1002, "Email hoặc mật khẩu sai", HttpStatus.UNAUTHORIZED),
     FULLNAME_REQUIRED(1003, "Họ và tên không được để trống", HttpStatus.BAD_REQUEST),
