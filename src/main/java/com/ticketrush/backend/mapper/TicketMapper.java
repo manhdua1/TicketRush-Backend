@@ -10,7 +10,8 @@ public interface TicketMapper {
 
     @Mapping(source = "seat.zone.event.title", target = "eventTitle")
     @Mapping(source = "seat.zone.event.venue", target = "venue")
-    @Mapping(source = "seat.zone.event.eventDate", target = "eventDate")
+    @Mapping(source = "seat.zone.event.startTime", target = "startTime")
+    @Mapping(source = "seat.zone.event.endTime", target = "endTime")
     @Mapping(source = "seat.zone.name", target = "zoneName")
     @Mapping(source = "seat.label", target = "seatLabel")
     @Mapping(source = "seat.zone.price", target = "price")

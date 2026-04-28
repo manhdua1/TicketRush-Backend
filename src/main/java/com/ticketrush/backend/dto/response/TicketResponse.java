@@ -13,7 +13,8 @@ public class TicketResponse {
     private String status;
     private String eventTitle;
     private String venue;
-    private LocalDateTime eventDate;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private String zoneName;
     private String seatLabel;
     private BigDecimal price;

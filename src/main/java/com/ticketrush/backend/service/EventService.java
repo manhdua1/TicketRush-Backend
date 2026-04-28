@@ -33,7 +33,8 @@ public class EventService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .venue(request.getVenue())
-                .eventDate(request.getEventDate())
+                .startTime(request.getStartTime())
+                .endTime(request.getEndTime())
                 .posterUrl(request.getPosterUrl())
                 .status(Event.Status.DRAFT)
                 .type(request.getType())
@@ -51,7 +52,8 @@ public class EventService {
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
         event.setVenue(request.getVenue());
-        event.setEventDate(request.getEventDate());
+        event.setStartTime(request.getStartTime());
+        event.setEndTime(request.getEndTime());
         event.setPosterUrl(request.getPosterUrl());
         event.setType(request.getType());
 
