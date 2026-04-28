@@ -36,6 +36,9 @@ public class User {
     @Column(nullable = false)
     Role role = Role.CUSTOMER;
 
+    @Column(name = "avatar_url")
+    String avatarUrl;
+
     @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt = LocalDateTime.now();
 
