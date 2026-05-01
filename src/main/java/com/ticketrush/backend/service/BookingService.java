@@ -29,6 +29,7 @@ public class BookingService {
     TicketRepository ticketRepository;
     UserRepository userRepository;
     BookingMapper bookingMapper;
+    WebSocketService webSocketService;
 
     @Transactional
     public BookingResponse lockSeats(BookingRequest request, Integer userId) {
@@ -49,6 +50,13 @@ public class BookingService {
             seatRepository.save(seat);
             lockedSeats.add(seat);
             totalPrice = totalPrice.add(seat.getZone().getPrice());
+
+            webSocketService.broadcastSeatStatus(
+                    seat.getZone().getEvent().getId(),
+                    seat.getId(),
+                    seat.getLabel(),
+                    Seat.Status.LOCKED
+            );
         }
 
         // Tạo booking với thời hạn 10 phút
@@ -100,6 +108,13 @@ public class BookingService {
             seatRepository.save(seat);
             seats.add(seat);
 
+            webSocketService.broadcastSeatStatus(
+                    seat.getZone().getEvent().getId(),
+                    seat.getId(),
+                    seat.getLabel(),
+                    Seat.Status.SOLD
+            );
+
             Ticket ticket = Ticket.builder()
                     .booking(booking)
                     .seat(seat)
@@ -132,6 +147,13 @@ public class BookingService {
             Seat seat = bs.getSeat();
             seat.setStatus(Seat.Status.AVAILABLE);
             seatRepository.save(seat);
+
+            webSocketService.broadcastSeatStatus(
+                    seat.getZone().getEvent().getId(),
+                    seat.getId(),
+                    seat.getLabel(),
+                    Seat.Status.AVAILABLE
+            );
         });
     }
 }

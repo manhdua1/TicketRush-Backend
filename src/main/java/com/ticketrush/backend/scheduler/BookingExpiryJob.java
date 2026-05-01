@@ -5,6 +5,7 @@ import com.ticketrush.backend.entity.Seat;
 import com.ticketrush.backend.repository.BookingRepository;
 import com.ticketrush.backend.repository.SeatRepository;
 import com.ticketrush.backend.service.SeatService;
+import com.ticketrush.backend.service.WebSocketService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class BookingExpiryJob {
     BookingRepository bookingRepository;
     SeatRepository seatRepository;
     SeatService seatService;
+    WebSocketService webSocketService;
 
     @Scheduled(fixedDelay = 60000)
     @Transactional
@@ -38,6 +40,13 @@ public class BookingExpiryJob {
                 Seat seat = bs.getSeat();
                 seat.setStatus(Seat.Status.AVAILABLE);
                 seatRepository.save(seat);
+
+                webSocketService.broadcastSeatStatus(
+                        booking.getEvent().getId(),
+                        seat.getId(),
+                        seat.getLabel(),
+                        Seat.Status.AVAILABLE
+                );
             });
 
             log.info("Released expired booking id={}", booking.getId());
