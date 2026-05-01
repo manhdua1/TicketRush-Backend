@@ -19,4 +19,16 @@ public interface SeatRepository extends JpaRepository<Seat, Integer> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM Seat s WHERE s.id = :id")
     Optional<Seat> findByIdWithLock(Integer id);
+
+    @Query("SELECT COUNT(s) FROM Seat s WHERE s.zone.event.id = :eventId")
+    Integer countTotalByEventId(Integer eventId);
+
+    @Query("SELECT COUNT(s) FROM Seat s WHERE s.zone.event.id = :eventId AND s.status = :status")
+    Integer countByEventIdAndStatus(Integer eventId, Seat.Status status);
+
+    @Query("SELECT COUNT(s) FROM Seat s WHERE s.zone.id = :zoneId AND s.status = :status")
+    Integer countByZoneIdAndStatus(Integer zoneId, Seat.Status status);
+
+    @Query("SELECT COUNT(s) FROM Seat s WHERE s.zone.id = :zoneId")
+    Integer countTotalByZoneId(Integer zoneId);
 }
