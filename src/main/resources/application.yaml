@@ -48,3 +48,10 @@ cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME}
   api-key: ${CLOUDINARY_API_KEY}
   api-secret: ${CLOUDINARY_API_SECRET}
+
+vnpay:
+  tmn-code: N4TODBJN
+  hash-secret: DKXHIYQK9JTP8Z8HW5BNSSIPMGISOXMJ
+  pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: http://localhost:3000/payment/return
+  ipn-url: http://your-domain/api/payment/ipn
