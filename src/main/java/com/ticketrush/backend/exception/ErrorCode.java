@@ -43,7 +43,8 @@ public enum ErrorCode {
     TICKET_NOT_FOUND(1030, "Không tìm thấy vé", HttpStatus.BAD_REQUEST),
     FILE_EMPTY(1031, "File không được rỗng", HttpStatus.BAD_REQUEST),
     INVALID_FILE_TYPE(1032, "Chỉ chấp nhận file ảnh", HttpStatus.BAD_REQUEST),
-    UPLOAD_FAILED(1033, "Upload ảnh thất bại", HttpStatus.INTERNAL_SERVER_ERROR)
+    UPLOAD_FAILED(1033, "Upload ảnh thất bại", HttpStatus.INTERNAL_SERVER_ERROR),
+    PAYMENT_FAILED(1034, "Thanh toán thất bại", HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

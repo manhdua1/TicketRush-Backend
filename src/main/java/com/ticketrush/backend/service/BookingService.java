@@ -30,6 +30,7 @@ public class BookingService {
     UserRepository userRepository;
     BookingMapper bookingMapper;
     WebSocketService webSocketService;
+    VNPayService vnPayService;
 
     @Transactional
     public BookingResponse lockSeats(BookingRequest request, Integer userId) {
@@ -154,6 +155,44 @@ public class BookingService {
                     seat.getLabel(),
                     Seat.Status.AVAILABLE
             );
+        });
+    }
+
+    @Transactional
+    public String createPayment(Integer bookingId, Integer userId, String ipAddr) throws Exception {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+
+        if (!booking.getUser().getId().equals(userId))
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+
+        if (booking.getStatus() != Booking.Status.PENDING)
+            throw new AppException(ErrorCode.BOOKING_EXPIRED);
+
+        return vnPayService.createPaymentUrl(bookingId, booking.getTotalAmount(), ipAddr);
+    }
+
+    @Transactional
+    public void confirmBookingBySystem(Integer bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+
+        if (booking.getStatus() != Booking.Status.PENDING) return;
+
+        booking.setStatus(Booking.Status.CONFIRMED);
+        bookingRepository.save(booking);
+
+        booking.getBookingSeats().forEach(bs -> {
+            Seat seat = bs.getSeat();
+            seat.setStatus(Seat.Status.SOLD);
+            seatRepository.save(seat);
+            ticketRepository.save(Ticket.builder()
+                    .booking(booking).seat(seat)
+                    .qrCode(UUID.randomUUID().toString())
+                    .status(Ticket.Status.ACTIVE)
+                    .build());
+            webSocketService.broadcastSeatStatus(
+                    booking.getEvent().getId(), seat.getId(), seat.getLabel(), Seat.Status.SOLD);
         });
     }
 }
