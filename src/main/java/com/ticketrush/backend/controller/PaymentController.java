@@ -68,9 +68,6 @@ public class PaymentController {
     public ApiResponse<String> returnUrl(@RequestParam Map<String, String> params) {
         String responseCode = params.get("vnp_ResponseCode");
         if ("00".equals(responseCode)) {
-            Integer bookingId = Integer.parseInt(params.get("vnp_TxnRef"));
-            log.info("abcxyz");
-            bookingService.confirmBookingBySystem(bookingId);
             return ApiResponse.success("Thanh toán thành công");
         }
         return ApiResponse.error(ErrorCode.PAYMENT_FAILED);
