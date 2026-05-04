@@ -53,5 +53,5 @@ vnpay:
   tmn-code: N4TODBJN
   hash-secret: DKXHIYQK9JTP8Z8HW5BNSSIPMGISOXMJ
   pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-  return-url: http://localhost:3000/payment/return
+  return-url: https://ticketrush-backend-xu9y.onrender.com/api/payment/return
   ipn-url: https://ticketrush-backend-xu9y.onrender.com/api/payment/ipn

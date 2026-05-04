@@ -65,11 +65,17 @@ public class PaymentController {
 
     // Return URL — chỉ hiển thị kết quả cho user
     @GetMapping("/return")
-    public ApiResponse<String> returnUrl(@RequestParam Map<String, String> params) {
+    public ResponseEntity<String> returnUrl(@RequestParam Map<String, String> params) {
         String responseCode = params.get("vnp_ResponseCode");
         if ("00".equals(responseCode)) {
-            return ApiResponse.success("Thanh toán thành công");
+            Integer bookingId = Integer.parseInt(params.get("vnp_TxnRef"));
+            bookingService.confirmBookingBySystem(bookingId);
+            return ResponseEntity.ok()
+                    .header("Content-Type", "text/html; charset=UTF-8")
+                    .body("<html><body><h2>Thanh toán thành công</h2></body></html>");
         }
-        return ApiResponse.error(ErrorCode.PAYMENT_FAILED);
+        return ResponseEntity.ok()
+                .header("Content-Type", "text/html; charset=UTF-8")
+                .body("<html><body><h2>Thanh toán thất bại</h2></body></html>");
     }
 }
