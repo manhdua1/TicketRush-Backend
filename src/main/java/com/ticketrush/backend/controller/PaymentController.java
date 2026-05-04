@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,7 @@ import java.util.Map;
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class PaymentController {
     BookingService bookingService;
     VNPayService vnPayService;
@@ -66,6 +68,9 @@ public class PaymentController {
     public ApiResponse<String> returnUrl(@RequestParam Map<String, String> params) {
         String responseCode = params.get("vnp_ResponseCode");
         if ("00".equals(responseCode)) {
+            Integer bookingId = Integer.parseInt(params.get("vnp_TxnRef"));
+            log.info("abcxyz");
+            bookingService.confirmBookingBySystem(bookingId);
             return ApiResponse.success("Thanh toán thành công");
         }
         return ApiResponse.error(ErrorCode.PAYMENT_FAILED);
