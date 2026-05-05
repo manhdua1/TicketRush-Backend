@@ -33,6 +33,8 @@ public class EventService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .venue(request.getVenue())
+                .longitude(request.getLongitude())
+                .latitude(request.getLatitude())
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
                 .posterUrl(request.getPosterUrl())
@@ -52,6 +54,8 @@ public class EventService {
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
         event.setVenue(request.getVenue());
+        event.setLatitude(request.getLatitude());
+        event.setLongitude(request.getLongitude());
         event.setStartTime(request.getStartTime());
         event.setEndTime(request.getEndTime());
         event.setPosterUrl(request.getPosterUrl());

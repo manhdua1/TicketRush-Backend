@@ -16,6 +16,8 @@ public class EventResponse {
     String title;
     String description;
     String venue;
+    Double longitude;
+    Double latitude;
     LocalDateTime startTime;
     LocalDateTime endTime;
     String posterUrl;

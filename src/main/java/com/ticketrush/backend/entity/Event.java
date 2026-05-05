@@ -30,6 +30,12 @@ public class Event {
     @Column(nullable = false)
     String venue;
 
+    @Column
+    Double longitude;
+
+    @Column
+    Double latitude;
+
     @Column(name = "start_time", nullable = false)
     LocalDateTime startTime;
 
