@@ -1,7 +1,9 @@
 package com.ticketrush.backend.service;
 
+import com.ticketrush.backend.dto.request.ChangePasswordRequest;
 import com.ticketrush.backend.dto.request.LoginRequest;
 import com.ticketrush.backend.dto.request.RegisterRequest;
+import com.ticketrush.backend.dto.request.ResetPasswordRequest;
 import com.ticketrush.backend.dto.response.AuthResponse;
 import com.ticketrush.backend.dto.response.UserDetailsResponse;
 import com.ticketrush.backend.dto.response.UserResponse;
@@ -31,10 +33,25 @@ public class AuthService {
     PasswordEncoder passwordEncoder;
     UserMapper userMapper;
     JwtService jwtService;
+    OtpService otpService;
+    EmailService emailService;
+
+    public void sendRegisterOtp(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+
+        String otp = otpService.generateOtp("register:" + email);
+        emailService.sendOtp(email, otp, "[TicketRush] Mã xác thực đăng ký");
+    }
 
     public UserResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+
+        if (!otpService.verifyOtp("register:" + request.getEmail(), request.getOtp())) {
+            throw new AppException(ErrorCode.INVALID_OTP);
         }
 
         String passwordHashed = passwordEncoder.encode(request.getPassword());
@@ -52,6 +69,40 @@ public class AuthService {
         userRepository.save(user);
 
         return userMapper.toUserResponse(user);
+    }
+
+    public void sendForgotPasswordOtp(String email) {
+        if (!userRepository.existsByEmail(email)) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+        String otp = otpService.generateOtp("reset:" + email);
+        emailService.sendOtp(email, otp, "[TicketRush] Mã xác thực đặt lại mật khẩu)");
+    }
+
+    public void resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (!otpService.verifyOtp("reset:" + request.getEmail(), request.getOtp())) {
+            throw new AppException(ErrorCode.INVALID_OTP);
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    public void changePassword(ChangePasswordRequest request, Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        String oldPassword = user.getPasswordHash();
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), oldPassword)) {
+            throw new AppException(ErrorCode.INVALID_CREDENTIALS);
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 
     public AuthResponse login(LoginRequest request) {
