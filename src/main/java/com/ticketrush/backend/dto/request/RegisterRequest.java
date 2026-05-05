@@ -13,17 +13,20 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterRequest {
     @NotBlank(message = "FULLNAME_REQUIRED")
-    private String fullName;
+    String fullName;
 
     @Email(message = "INVALID_EMAIL") @NotBlank(message = "EMAIL_REQUIRED")
-    private String email;
+    String email;
 
     @NotBlank(message = "PASSWORD_REQUIRED") @Size(min = 6, max = 20, message = "INVALID_PASSWORD")
-    private String password;
+    String password;
 
     @PastOrPresent(message = "INVALID_DOB")
-    private LocalDate dateOfBirth;
+    LocalDate dateOfBirth;
 
     @NotNull(message = "GENDER_REQUIRED")
-    private User.Gender gender;
+    User.Gender gender;
+
+    @NotBlank(message = "OTP_REQUIRED")
+    String otp;
 }
