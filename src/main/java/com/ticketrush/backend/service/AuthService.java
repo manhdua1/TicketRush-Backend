@@ -78,8 +78,12 @@ public class AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .orElse(null);
 
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
         return UserDetailsResponse.builder()
                 .email(userDetails.getUsername())
+                .avatarUrl(user.getAvatarUrl())
                 .role(role)
                 .build();
     }
