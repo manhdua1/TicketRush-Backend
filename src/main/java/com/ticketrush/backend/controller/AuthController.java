@@ -1,13 +1,13 @@
 package com.ticketrush.backend.controller;
 
-import com.ticketrush.backend.dto.request.LoginRequest;
-import com.ticketrush.backend.dto.request.RegisterRequest;
+import com.ticketrush.backend.dto.request.*;
 import com.ticketrush.backend.dto.response.ApiResponse;
 import com.ticketrush.backend.dto.response.AuthResponse;
 import com.ticketrush.backend.dto.response.UserDetailsResponse;
 import com.ticketrush.backend.dto.response.UserResponse;
 import com.ticketrush.backend.exception.AppException;
 import com.ticketrush.backend.exception.ErrorCode;
+import com.ticketrush.backend.repository.UserRepository;
 import com.ticketrush.backend.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -34,6 +34,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthController {
     AuthService authService;
+    UserRepository userRepository;
+
+    @Operation(summary = "Gửi OTP đăng ký")
+    @PostMapping("/send-register-otp")
+    public ApiResponse<Void> sendRegisterOtp(@Valid @RequestBody SendOtpRequest request) {
+        authService.sendRegisterOtp(request.getEmail());
+        return ApiResponse.success(null);
+    }
 
     @Operation(summary = "Đăng ký tài khoản mới")
     @PostMapping("/register")
@@ -56,6 +64,31 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
 
+        return ApiResponse.success(null);
+    }
+
+    @Operation(summary = "Gửi OTP quên mật khẩu")
+    @PostMapping("/forgot-password")
+    public ApiResponse<Void> forgotPassword(@Valid @RequestBody SendOtpRequest request) {
+        authService.sendForgotPasswordOtp(request.getEmail());
+        return ApiResponse.success(null);
+    }
+
+    @Operation(summary = "Đặt lại mật khẩu")
+    @PostMapping("/reset-password")
+    public ApiResponse<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ApiResponse.success(null);
+    }
+
+    @Operation(summary = "Đổi mật khẩu (cần đăng nhập)")
+    @PostMapping("/change-password")
+    public ApiResponse<Void> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Integer userId = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow().getId();
+        authService.changePassword(request, userId);
         return ApiResponse.success(null);
     }
 

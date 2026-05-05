@@ -72,8 +72,8 @@ public class AuthService {
     }
 
     public void sendForgotPasswordOtp(String email) {
-        if (userRepository.existsByEmail(email)) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        if (!userRepository.existsByEmail(email)) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
         String otp = otpService.generateOtp("reset:" + email);
         emailService.sendOtp(email, otp, "[TicketRush] Mã xác thực đặt lại mật khẩu)");

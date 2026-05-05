@@ -20,7 +20,7 @@ public class EmailService {
     public void sendOtp(String to, String otp, String subject) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
-        message.setTo(from);
+        message.setTo(to);
         message.setSubject(subject);
         message.setText(
                 "Mã OTP của bạn là: " + otp + "\n" +
