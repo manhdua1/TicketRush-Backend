@@ -1,3 +1,6 @@
+# Frontend Github Repo:
+https://github.com/HieuPD123/TicketRush-Frontend
+
 # Tech Stack
 * Build tool: Maven >= 3.9.5
 * Java: 21
