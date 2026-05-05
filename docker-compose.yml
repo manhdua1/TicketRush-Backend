@@ -30,3 +30,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JACKSON_TIME_ZONE=Asia/Ho_Chi_Minh
+
+  redis:
+    image: redis:8.4.2-alpine3.22
+    ports:
+      - "6379:6379"
