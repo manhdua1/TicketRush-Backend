@@ -77,7 +77,7 @@ public class EventController {
 
     @Operation(summary = "Lấy sự kiện theo thể loại")
     @GetMapping("/events/by-type")
-    public ApiResponse<List<EventResponse>> getEventsByType(@Valid @RequestParam Event.Type type) {
+    public ApiResponse<List<EventResponse>> getEventsByType(@RequestParam(required = false) Event.Type type) {
         return ApiResponse.success(eventService.getEventByType(type));
     }
 
