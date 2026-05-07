@@ -4,6 +4,7 @@ import com.ticketrush.backend.dto.request.EventRequest;
 import com.ticketrush.backend.dto.request.EventStatusRequest;
 import com.ticketrush.backend.dto.response.ApiResponse;
 import com.ticketrush.backend.dto.response.EventResponse;
+import com.ticketrush.backend.dto.response.PageResponse;
 import com.ticketrush.backend.entity.Event;
 import com.ticketrush.backend.exception.AppException;
 import com.ticketrush.backend.exception.ErrorCode;
@@ -78,5 +79,16 @@ public class EventController {
     @GetMapping("/events/by-type")
     public ApiResponse<List<EventResponse>> getEventsByType(@Valid @RequestParam Event.Type type) {
         return ApiResponse.success(eventService.getEventByType(type));
+    }
+
+    @Operation(summary = "Tìm kiếm sự kiện ON_SALE theo tên và/hoặc thể loại, có phân trang")
+    @GetMapping("/events")
+    public ApiResponse<PageResponse<EventResponse>> searchEvents(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Event.Type type,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.success(eventService.searchEvents(name, type, page, size));
     }
 }
