@@ -2,17 +2,24 @@ package com.ticketrush.backend.service;
 
 import com.ticketrush.backend.dto.request.EventRequest;
 import com.ticketrush.backend.dto.response.EventResponse;
+import com.ticketrush.backend.dto.response.PageResponse;
 import com.ticketrush.backend.entity.Event;
 import com.ticketrush.backend.entity.User;
 import com.ticketrush.backend.exception.AppException;
 import com.ticketrush.backend.exception.ErrorCode;
 import com.ticketrush.backend.mapper.EventMapper;
 import com.ticketrush.backend.repository.EventRepository;
+import com.ticketrush.backend.repository.EventSpecification;
 import com.ticketrush.backend.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -93,5 +100,15 @@ public class EventService {
         return events.stream()
                 .map(eventMapper::toEventResponse)
                 .toList();
+    }
+
+    public PageResponse<EventResponse> searchEvents(String name, Event.Type type, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").ascending());
+        Specification<Event> spec = EventSpecification.filter(name, type);
+
+        Page<EventResponse> result = eventRepository.findAll(spec, pageable)
+                .map(eventMapper::toEventResponse);
+
+        return PageResponse.of(result);
     }
 }

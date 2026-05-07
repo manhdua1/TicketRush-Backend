@@ -51,6 +51,8 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/register",
                                 "/api/auth/logout",
+                                "/api/auth/send-register-otp",
+                                "/api/auth/reset-password",
                                 "/v3/api-docs/**",
                                 "/ws/**",
                                 "/swagger-ui/**",
