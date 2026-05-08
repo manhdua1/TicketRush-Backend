@@ -10,10 +10,19 @@ public class EventSpecification {
      * và/hoặc type.
      */
     public static Specification<Event> filter(String name, Event.Type type) {
-        return Specification
-                .where(onSale())
-                .and(titleContains(name))
-                .and(hasType(type));
+        Specification<Event> spec = Specification.where(onSale());
+
+        Specification<Event> nameSpec = titleContains(name);
+        if (nameSpec != null) {
+            spec = spec.and(nameSpec);
+        }
+
+        Specification<Event> typeSpec = hasType(type);
+        if (typeSpec != null) {
+            spec = spec.and(typeSpec);
+        }
+
+        return spec;
     }
 
     private static Specification<Event> onSale() {
