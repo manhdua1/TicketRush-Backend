@@ -61,4 +61,4 @@ cloudinary:
   api-secret: ${CLOUDINARY_API_SECRET}
 
 otp:
-  expiration: 300 # 5 phút
+  expiration: 120 # 2 phút
