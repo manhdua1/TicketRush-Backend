@@ -45,7 +45,8 @@ public enum ErrorCode {
     INVALID_FILE_TYPE(1032, "Chỉ chấp nhận file ảnh", HttpStatus.BAD_REQUEST),
     UPLOAD_FAILED(1033, "Upload ảnh thất bại", HttpStatus.INTERNAL_SERVER_ERROR),
     OTP_REQUIRED(1034, "Otp không được để trống", HttpStatus.BAD_REQUEST),
-    INVALID_OTP(1035, "Otp không hợp lệ", HttpStatus.BAD_REQUEST)
+    INVALID_OTP(1035, "Otp không hợp lệ", HttpStatus.BAD_REQUEST),
+    OTP_EXISTED(1036, "Mã Otp đã tồn tại, vui lòng nhập mã đã có", HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

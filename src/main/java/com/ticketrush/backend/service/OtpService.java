@@ -1,5 +1,7 @@
 package com.ticketrush.backend.service;
 
+import com.ticketrush.backend.exception.AppException;
+import com.ticketrush.backend.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,12 +17,16 @@ import java.util.Random;
 public class OtpService {
     private final RedisTemplate<String, Object> redisTemplate;
 
-    @Value("${otp.expiration:300}")
+    @Value("${otp.expiration:120}")
     private long otpExpiration;
 
     private static final String OTP_PREFIX = "otp:";
 
     public String generateOtp(String email) {
+        if (hasOtp(email)) {
+            throw new AppException(ErrorCode.OTP_EXISTED);
+        }
+
         String otp = String.format("%06d", new Random().nextInt(999999));
         redisTemplate.opsForValue().set(
                 OTP_PREFIX + email, otp, Duration.ofSeconds(otpExpiration)
