@@ -26,8 +26,7 @@ public class OtpService {
     public String generateOtp(String email) {
         if (hasOtp(email)) {
             long ttl = getOtpTtl(email);
-            throw new AppException(ErrorCode.OTP_EXISTED,
-                    "OTP đã tồn tại, vui lòng thử lại sau " + ttl + " giây");
+            throw new AppException(ErrorCode.OTP_EXISTED, String.valueOf(ttl));
         }
 
         String otp = String.format("%06d", new Random().nextInt(999999));
