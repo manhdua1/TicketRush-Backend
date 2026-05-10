@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +25,9 @@ public class OtpService {
 
     public String generateOtp(String email) {
         if (hasOtp(email)) {
-            throw new AppException(ErrorCode.OTP_EXISTED);
+            long ttl = getOtpTtl(email);
+            throw new AppException(ErrorCode.OTP_EXISTED,
+                    "OTP đã tồn tại, vui lòng thử lại sau " + ttl + " giây");
         }
 
         String otp = String.format("%06d", new Random().nextInt(999999));
@@ -44,5 +47,10 @@ public class OtpService {
 
     public boolean hasOtp(String email) {
         return Boolean.TRUE.equals(redisTemplate.hasKey(OTP_PREFIX + email));
+    }
+
+    public long getOtpTtl(String email) {
+        Long ttl = redisTemplate.getExpire(OTP_PREFIX + email, TimeUnit.SECONDS);
+        return (ttl != null && ttl > 0) ? ttl : 0;
     }
 }
