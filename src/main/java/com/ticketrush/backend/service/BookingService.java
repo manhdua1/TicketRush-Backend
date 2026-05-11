@@ -30,9 +30,16 @@ public class BookingService {
     UserRepository userRepository;
     BookingMapper bookingMapper;
     WebSocketService webSocketService;
+    QueueService queueService;
 
     @Transactional
     public BookingResponse lockSeats(BookingRequest request, Integer userId) {
+        if (request.getQueueToken() != null) {
+            if (!queueService.isGranted(request.getQueueToken())) {
+                throw new AppException(ErrorCode.NOT_IN_QUEUE);
+            }
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 

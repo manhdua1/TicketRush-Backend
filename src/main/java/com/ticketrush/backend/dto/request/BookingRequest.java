@@ -10,4 +10,5 @@ import java.util.List;
 public class BookingRequest {
     @NotEmpty
     private List<Integer> seatIds;
+    private String queueToken;
 }
