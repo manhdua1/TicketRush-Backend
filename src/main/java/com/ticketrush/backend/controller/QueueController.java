@@ -38,6 +38,22 @@ public class QueueController {
         return ApiResponse.success(queueService.getQueueStatus(token));
     }
 
+    @Operation(summary = "Heartbeat — giữ session active trong hàng chờ")
+    @PostMapping("/heartbeat/{eventId}")
+    public ApiResponse<Void> heartbeat(
+            @PathVariable Integer eventId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Integer userId = extractUserId(userDetails);
+        queueService.trackActiveUser(eventId, userId);
+        return ApiResponse.success(null);
+    }
+
+    @Operation(summary = "Kiểm tra event có yêu cầu hàng chờ không")
+    @GetMapping("/check/{eventId}")
+    public ApiResponse<Boolean> isQueueRequired(@PathVariable Integer eventId) {
+        return ApiResponse.success(queueService.isQueueRequired(eventId));
+    }
+
     private Integer extractUserId(UserDetails userDetails) {
         return userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow().getId();

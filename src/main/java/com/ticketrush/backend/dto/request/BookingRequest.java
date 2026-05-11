@@ -10,5 +10,7 @@ import java.util.List;
 public class BookingRequest {
     @NotEmpty
     private List<Integer> seatIds;
+
+    // Có thể null khi event không yêu cầu hàng chờ
     private String queueToken;
 }

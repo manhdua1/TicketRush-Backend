@@ -27,10 +27,12 @@ import java.util.List;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@Slf4j
 public class EventService {
     EventRepository eventRepository;
     UserRepository userRepository;
     EventMapper eventMapper;
+    QueueService queueService;
 
     public EventResponse createEvent(EventRequest request, Integer adminId) {
         User admin = userRepository.findById(adminId)
@@ -84,6 +86,27 @@ public class EventService {
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_FOUND));
 
         return eventMapper.toEventResponse(event);
+    }
+
+    /**
+     * Lấy event + tracking active user + kiểm tra queue requirement.
+     * Gọi khi user đã đăng nhập truy cập event detail.
+     */
+    public EventResponse getEventByIdForUser(Integer eventId, Integer userId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_FOUND));
+
+        // Track user đang xem event
+        queueService.trackActiveUser(eventId, userId);
+
+        EventResponse response = eventMapper.toEventResponse(event);
+
+        // Enrichment: thêm thông tin queue
+        int activeUsers = queueService.getActiveUserCount(eventId);
+        response.setQueueRequired(queueService.isQueueRequired(eventId));
+        response.setActiveUsers(activeUsers);
+
+        return response;
     }
 
     public EventResponse changeStatus(Integer id, Event.Status status) {
