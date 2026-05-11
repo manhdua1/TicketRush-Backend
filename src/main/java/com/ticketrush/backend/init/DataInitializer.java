@@ -50,14 +50,18 @@ public class DataInitializer implements CommandLineRunner {
 
     public void create200users() {
         String hash = passwordEncoder.encode("123456");
-
         List<User> users = new ArrayList<>();
         Random random = new Random();
         User.Gender[] genders = User.Gender.values();
 
         for (int i = 1; i <= 200; i++) {
+            String email = "user" + i + "@gmail.com";
+
+            // Double check — bỏ qua nếu email đã tồn tại
+            if (userRepository.existsByEmail(email)) continue;
+
             users.add(User.builder()
-                    .email("user" + i + "@gmail.com")
+                    .email(email)
                     .passwordHash(hash)
                     .fullName("User " + i)
                     .dateOfBirth(LocalDate.now().minusYears(18 + random.nextInt(42)))
@@ -67,6 +71,6 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         userRepository.saveAll(users);
-        log.info("Created 200 test users");
+        log.info("Created {} test users", users.size());
     }
 }
