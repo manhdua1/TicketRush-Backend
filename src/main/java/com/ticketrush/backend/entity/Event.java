@@ -45,6 +45,9 @@ public class Event {
     @Column(name = "poster_url")
     String posterUrl;
 
+    @Column(name = "is_spotlight", nullable = false)
+    boolean spotlight = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     Status status = Status.DRAFT;

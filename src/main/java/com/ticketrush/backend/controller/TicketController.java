@@ -28,7 +28,7 @@ public class TicketController {
     UserRepository userRepository;
 
     @Operation(summary = "Danh sách vé của tôi")
-    @GetMapping("/myTickets")
+    @GetMapping("/my-tickets")
     public ApiResponse<List<TicketResponse>> getMyTickets(
             @AuthenticationPrincipal UserDetails userDetails) {
         Integer userId = userRepository.findByEmail(userDetails.getUsername())

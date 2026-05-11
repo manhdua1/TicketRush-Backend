@@ -19,4 +19,10 @@ public interface EventRepository extends JpaRepository<Event, Integer>, JpaSpeci
 
     @Query("SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.zones WHERE e.type = :type ORDER BY e.startTime ASC")
     List<Event> findByTypeOrderByEventDateAsc(Event.Type type);
+
+    Optional<Event> findFirstBySpotlightTrueOrderByStartTimeAsc();
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE Event e SET e.spotlight = false WHERE e.spotlight = true")
+    void clearSpotlightFlags();
 }
