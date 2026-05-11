@@ -67,6 +67,16 @@ public class EventController {
         return ApiResponse.success(eventService.getEventById(id));
     }
 
+    @Operation(summary = "Lấy sự kiện + thông tin hàng chờ (cho user đã đăng nhập)")
+    @GetMapping("/events/{id}/detail")
+    public ApiResponse<EventResponse> getEventDetail(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Integer userId = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)).getId();
+        return ApiResponse.success(eventService.getEventByIdForUser(id, userId));
+    }
+
     @Operation(summary = "Thay đổi trạng thái sự kiện (Admin)")
     @PatchMapping("/admin/events/{id}/status")
     public ApiResponse<EventResponse> changeStatus(

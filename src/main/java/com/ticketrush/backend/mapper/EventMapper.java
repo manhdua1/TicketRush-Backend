@@ -12,5 +12,7 @@ public interface EventMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(source = "zones", target = "zones")
     @Mapping(source = "type", target = "type")
+    @Mapping(target = "queueRequired", ignore = true)
+    @Mapping(target = "activeUsers", ignore = true)
     EventResponse toEventResponse(Event event);
 }

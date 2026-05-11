@@ -46,7 +46,10 @@ public enum ErrorCode {
     UPLOAD_FAILED(1033, "Upload ảnh thất bại", HttpStatus.INTERNAL_SERVER_ERROR),
     OTP_REQUIRED(1034, "Otp không được để trống", HttpStatus.BAD_REQUEST),
     INVALID_OTP(1035, "Otp không hợp lệ", HttpStatus.BAD_REQUEST),
-    OTP_EXISTED(1036, "Mã Otp đã tồn tại, vui lòng nhập mã đã có", HttpStatus.BAD_REQUEST)
+    OTP_EXISTED(1036, "Mã Otp đã tồn tại, vui lòng nhập mã đã có", HttpStatus.BAD_REQUEST),
+    QUEUE_TOKEN_NOT_FOUND(1037, "Token hàng chờ không tồn tại", HttpStatus.NOT_FOUND),
+    NOT_IN_QUEUE(1038, "Bạn chưa có quyền vào đặt vé", HttpStatus.FORBIDDEN),
+    QUEUE_TOKEN_REQUIRED(1039, "Queue Token không được để trống", HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

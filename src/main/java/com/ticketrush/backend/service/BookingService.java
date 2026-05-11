@@ -30,9 +30,32 @@ public class BookingService {
     UserRepository userRepository;
     BookingMapper bookingMapper;
     WebSocketService webSocketService;
+    QueueService queueService;
 
     @Transactional
     public BookingResponse lockSeats(BookingRequest request, Integer userId) {
+        // Lấy eventId từ seat đầu tiên để check queue requirement
+        Seat firstSeat = seatRepository.findById(request.getSeatIds().get(0))
+                .orElseThrow(() -> new AppException(ErrorCode.SEAT_NOT_FOUND));
+        Integer eventId = firstSeat.getZone().getEvent().getId();
+
+        // ★ Kiểm tra queue: nếu event đang yêu cầu hàng chờ → bắt buộc phải có token
+        if (queueService.isQueueRequired(eventId)) {
+            if (request.getQueueToken() == null || request.getQueueToken().isBlank()) {
+                throw new AppException(ErrorCode.NOT_IN_QUEUE);
+            }
+            if (!queueService.isGranted(request.getQueueToken())) {
+                throw new AppException(ErrorCode.NOT_IN_QUEUE);
+            }
+        } else {
+            // Event không đông, nhưng nếu có gửi token thì vẫn validate
+            if (request.getQueueToken() != null && !request.getQueueToken().isBlank()) {
+                if (!queueService.isGranted(request.getQueueToken())) {
+                    throw new AppException(ErrorCode.NOT_IN_QUEUE);
+                }
+            }
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
