@@ -24,7 +24,7 @@ public class EmailService {
         message.setSubject(subject);
         message.setText(
                 "Mã OTP của bạn là: " + otp + "\n" +
-                        "Mã có hiệu lực trong 5 phút.\n"
+                        "Mã có hiệu lực trong 2 phút.\n"
         );
 
         javaMailSender.send(message);

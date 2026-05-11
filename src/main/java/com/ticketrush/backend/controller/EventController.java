@@ -2,6 +2,7 @@ package com.ticketrush.backend.controller;
 
 import com.ticketrush.backend.dto.request.EventRequest;
 import com.ticketrush.backend.dto.request.EventStatusRequest;
+    import com.ticketrush.backend.dto.request.SpotlightRequest;
 import com.ticketrush.backend.dto.response.ApiResponse;
 import com.ticketrush.backend.dto.response.EventResponse;
 import com.ticketrush.backend.dto.response.PageResponse;
@@ -67,6 +68,12 @@ public class EventController {
         return ApiResponse.success(eventService.getEventById(id));
     }
 
+    @Operation(summary = "Lấy sự kiện spotlight")
+    @GetMapping("/events/spotlight")
+    public ApiResponse<EventResponse> getSpotlightEvent() {
+        return ApiResponse.success(eventService.getSpotlightEvent());
+    }
+
     @Operation(summary = "Lấy sự kiện + thông tin hàng chờ (cho user đã đăng nhập)")
     @GetMapping("/events/{id}/detail")
     public ApiResponse<EventResponse> getEventDetail(
@@ -83,6 +90,14 @@ public class EventController {
             @PathVariable Integer id,
             @Valid @RequestBody EventStatusRequest request) {
         return ApiResponse.success(eventService.changeStatus(id, request.getStatus()));
+    }
+
+    @Operation(summary = "Set hoặc bỏ spotlight (Admin)")
+    @PatchMapping("/admin/events/{id}/spotlight")
+    public ApiResponse<EventResponse> setSpotlight(
+            @PathVariable Integer id,
+            @Valid @RequestBody SpotlightRequest request) {
+        return ApiResponse.success(eventService.setSpotlight(id, request.getSpotlight()));
     }
 
     @Operation(summary = "Lấy sự kiện theo thể loại")

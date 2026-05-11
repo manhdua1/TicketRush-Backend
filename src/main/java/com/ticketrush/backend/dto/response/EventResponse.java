@@ -25,6 +25,7 @@ public class EventResponse {
     String type;
     List<ZoneResponse> zones;
     LocalDateTime createdAt;
+    Boolean spotlight;
 
     // Queue info — set thủ công, không qua MapStruct
     Boolean queueRequired;

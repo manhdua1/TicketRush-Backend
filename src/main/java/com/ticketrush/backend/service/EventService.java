@@ -88,6 +88,28 @@ public class EventService {
         return eventMapper.toEventResponse(event);
     }
 
+    public EventResponse getSpotlightEvent() {
+        Event event = eventRepository.findFirstBySpotlightTrueOrderByStartTimeAsc()
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_FOUND));
+        return eventMapper.toEventResponse(event);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public EventResponse setSpotlight(Integer eventId, boolean spotlight) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_FOUND));
+
+        if (spotlight) {
+            eventRepository.clearSpotlightFlags();
+            event.setSpotlight(true);
+        } else {
+            event.setSpotlight(false);
+        }
+
+        eventRepository.save(event);
+        return eventMapper.toEventResponse(event);
+    }
+
     /**
      * Lấy event + tracking active user + kiểm tra queue requirement.
      * Gọi khi user đã đăng nhập truy cập event detail.
