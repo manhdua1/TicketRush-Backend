@@ -36,7 +36,7 @@ public class QueueService {
     UserRepository userRepository;
     EventRepository eventRepository;
 
-    private static final int BATCH_SIZE = 50;
+    private static final int BATCH_SIZE = 2;
     private static final int GRANTED_TTL_MINUTES = 10;
 
     private String queueKey(Integer eventId) {
