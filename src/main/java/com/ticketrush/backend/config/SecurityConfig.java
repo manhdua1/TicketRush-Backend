@@ -53,13 +53,14 @@ public class SecurityConfig {
                                 "/api/auth/logout",
                                 "/api/auth/send-register-otp",
                                 "/api/auth/reset-password",
+                                "/api/auth/forgot-password",
                                 "/v3/api-docs/**",
                                 "/ws/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/events/**").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers("/api/events/**", "/api/auth/change-password").hasAnyRole("ADMIN", "CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
