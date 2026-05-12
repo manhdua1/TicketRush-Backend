@@ -3,27 +3,29 @@ package com.ticketrush.backend.repository;
 import com.ticketrush.backend.entity.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.awt.print.Pageable;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Integer>, JpaSpecificationExecutor<Event> {
     @Query("SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.zones WHERE e.status = :status ORDER BY e.startTime ASC")
-    List<Event> findByStatusOrderByEventDateAsc(Event.Status status);
+    List<Event> findByStatusOrderByEventDateAsc(@Param("status") Event.Status status);
 
     @Query("SELECT e FROM Event e LEFT JOIN FETCH e.zones WHERE e.id = :id")
-    Optional<Event> findByIdWithZones(Integer id);
+    Optional<Event> findByIdWithZones(@Param("id") Integer id);
 
     @Query("SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.zones WHERE e.type = :type ORDER BY e.startTime ASC")
-    List<Event> findByTypeOrderByEventDateAsc(Event.Type type);
+    List<Event> findByTypeOrderByEventDateAsc(@Param("type") Event.Type type);
 
     Optional<Event> findFirstBySpotlightTrueOrderByStartTimeAsc();
 
-    @org.springframework.data.jpa.repository.Modifying
+    @Modifying
     @Query("UPDATE Event e SET e.spotlight = false WHERE e.spotlight = true")
     void clearSpotlightFlags();
 
@@ -41,5 +43,14 @@ public interface EventRepository extends JpaRepository<Event, Integer>, JpaSpeci
     ) DESC
     LIMIT :limit
     """, nativeQuery = true)
-    List<Event> findTrendingEvents(int limit);
+    List<Event> findTrendingEvents(@Param("limit") int limit);
+
+    @Query("SELECT e FROM Event e WHERE e.status = :status AND e.endTime < :time")
+    List<Event> findByStatusAndEndTimeBefore(
+            @Param("status") Event.Status status,
+            @Param("time") LocalDateTime time);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Event e SET e.status = :endedStatus WHERE e.status <> :endedStatus AND e.endTime < :time")
+    int markEndedEvents(@Param("endedStatus") Event.Status endedStatus, @Param("time") LocalDateTime time);
 }
