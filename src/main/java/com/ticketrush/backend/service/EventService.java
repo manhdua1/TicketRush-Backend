@@ -156,4 +156,11 @@ public class EventService {
 
         return PageResponse.of(result);
     }
+
+    public List<EventResponse> getTrendingEvents() {
+        return eventRepository.findTrendingEvents(5)
+                .stream()
+                .map(eventMapper::toEventResponse)
+                .toList();
+    }
 }
