@@ -2,7 +2,7 @@ package com.ticketrush.backend.controller;
 
 import com.ticketrush.backend.dto.request.EventRequest;
 import com.ticketrush.backend.dto.request.EventStatusRequest;
-    import com.ticketrush.backend.dto.request.SpotlightRequest;
+import com.ticketrush.backend.dto.request.SpotlightRequest;
 import com.ticketrush.backend.dto.response.ApiResponse;
 import com.ticketrush.backend.dto.response.EventResponse;
 import com.ticketrush.backend.dto.response.PageResponse;
@@ -17,10 +17,12 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(name = "Events", description = "Quản lý sự kiện")
@@ -111,10 +113,12 @@ public class EventController {
     public ApiResponse<PageResponse<EventResponse>> searchEvents(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Event.Type type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dstfrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dstto,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ApiResponse.success(eventService.searchEvents(name, type, page, size));
+        return ApiResponse.success(eventService.searchEvents(name, type, dstfrom, dstto, page, size));
     }
 
     @Operation(summary = "Lấy 5 sự kiện có tỉ lệ đặt ghế cao nhất")

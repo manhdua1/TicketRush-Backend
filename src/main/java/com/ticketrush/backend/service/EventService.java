@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -147,9 +148,9 @@ public class EventService {
                 .toList();
     }
 
-    public PageResponse<EventResponse> searchEvents(String name, Event.Type type, int page, int size) {
+    public PageResponse<EventResponse> searchEvents(String name, Event.Type type, LocalDateTime dstfrom, LocalDateTime dstto, int page, int size) {
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, Sort.by("startTime").ascending());
-        Specification<Event> spec = EventSpecification.filter(name, type);
+        Specification<Event> spec = EventSpecification.filter(name, type, dstfrom, dstto);
 
         Page<EventResponse> result = eventRepository.findAll(spec, pageable)
                 .map(eventMapper::toEventResponse);
