@@ -11,6 +11,6 @@ public class BookingRequest {
     @NotEmpty
     private List<Integer> seatIds;
 
-    // Có thể null khi event không yêu cầu hàng chờ
+    // Deprecated: queue token is now read from HttpOnly cookie.
     private String queueToken;
 }

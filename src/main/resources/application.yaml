@@ -68,6 +68,7 @@ queue:
   threshold: 10         # Số user đồng thời để kích hoạt hàng chờ (set thấp để test)
   batch-size: 10       # Số người được grant mỗi lượt
   granted-ttl: 10      # TTL quyền đặt vé (phút)
+  token-cookie-ttl: 60 # TTL cookie queue token (phút)
   active-user-ttl: 60  # TTL session active user (giây)
 
 redis:
