@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -33,26 +34,24 @@ public class BookingService {
     QueueService queueService;
 
     @Transactional
-    public BookingResponse lockSeats(BookingRequest request, Integer userId) {
+    public BookingResponse lockSeats(BookingRequest request, Integer userId, Map<Integer, String> queueTokensByEventId) {
         // Lấy eventId từ seat đầu tiên để check queue requirement
         Seat firstSeat = seatRepository.findById(request.getSeatIds().get(0))
                 .orElseThrow(() -> new AppException(ErrorCode.SEAT_NOT_FOUND));
         Integer eventId = firstSeat.getZone().getEvent().getId();
+        String queueToken = queueTokensByEventId.get(eventId);
+        if ((queueToken == null || queueToken.isBlank())
+                && request.getQueueToken() != null && !request.getQueueToken().isBlank()) {
+            queueToken = request.getQueueToken();
+        }
 
         // ★ Kiểm tra queue: nếu event đang yêu cầu hàng chờ → bắt buộc phải có token
         if (queueService.isQueueRequired(eventId)) {
-            if (request.getQueueToken() == null || request.getQueueToken().isBlank()) {
+            if (queueToken == null || queueToken.isBlank()) {
                 throw new AppException(ErrorCode.NOT_IN_QUEUE);
             }
-            if (!queueService.isGranted(request.getQueueToken())) {
+            if (!queueService.isGranted(queueToken, userId, eventId)) {
                 throw new AppException(ErrorCode.NOT_IN_QUEUE);
-            }
-        } else {
-            // Event không đông, nhưng nếu có gửi token thì vẫn validate
-            if (request.getQueueToken() != null && !request.getQueueToken().isBlank()) {
-                if (!queueService.isGranted(request.getQueueToken())) {
-                    throw new AppException(ErrorCode.NOT_IN_QUEUE);
-                }
             }
         }
 
