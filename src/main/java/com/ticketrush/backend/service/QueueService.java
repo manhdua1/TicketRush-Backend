@@ -217,6 +217,28 @@ public class QueueService {
         return Boolean.TRUE.equals(exists);
     }
 
+    @Transactional
+    public void leaveQueue(String token, Integer userId, Integer eventId) {
+        QueueToken queueToken = queueTokenRepository.findByTokenAndUserIdAndEventId(token, userId, eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.QUEUE_TOKEN_NOT_FOUND));
+
+        boolean shouldBroadcastQueueUpdate = queueToken.getStatus() == QueueToken.Status.WAITING;
+
+        redisTemplate.opsForZSet().remove(queueKey(eventId), token);
+        redisTemplate.delete(grantedKey(token));
+
+        if (queueToken.getStatus() != QueueToken.Status.EXPIRED) {
+            queueToken.setStatus(QueueToken.Status.EXPIRED);
+            queueTokenRepository.save(queueToken);
+        }
+
+        if (shouldBroadcastQueueUpdate) {
+            broadcastQueueUpdate(eventId);
+        }
+
+        log.info("User {} left queue for event {}", userId, eventId);
+    }
+
     @Scheduled(fixedDelay = 30000)
     public void processQueue() {
         Set<String> queueKeys = redisTemplate.keys("queue:*");
