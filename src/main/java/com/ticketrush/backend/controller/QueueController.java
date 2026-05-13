@@ -50,6 +50,20 @@ public class QueueController {
         return ApiResponse.success(hideQueueToken(queueResponse));
     }
 
+    @Operation(summary = "Thoát khỏi hàng chờ")
+    @DeleteMapping("/leave/{eventId}")
+    public ApiResponse<Void> leaveQueue(
+            @PathVariable Integer eventId,
+            @AuthenticationPrincipal UserDetails userDetails,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        Integer userId = extractUserId(userDetails);
+        QueueCookieUtils.getQueueToken(request, eventId)
+                .ifPresent(token -> queueService.leaveQueue(token, userId, eventId));
+        clearQueueCookie(response, eventId);
+        return ApiResponse.success(null);
+    }
+
     @Operation(summary = "Kiểm tra vị trí hàng chờ")
     @GetMapping("/status/{eventId}")
     public ApiResponse<QueueStatusResponse> getStatus(
@@ -89,5 +103,15 @@ public class QueueController {
                 .totalInQueue(response.getTotalInQueue())
                 .message(response.getMessage())
                 .build();
+    }
+
+    private void clearQueueCookie(HttpServletResponse response, Integer eventId) {
+        ResponseCookie deleteCookie = ResponseCookie.from(QueueCookieUtils.cookieName(eventId), "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
     }
 }
