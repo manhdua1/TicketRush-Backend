@@ -2,11 +2,17 @@ package com.ticketrush.backend.init;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ticketrush.backend.entity.Booking;
+import com.ticketrush.backend.entity.BookingSeat;
 import com.ticketrush.backend.entity.Event;
 import com.ticketrush.backend.entity.Seat;
+import com.ticketrush.backend.entity.Ticket;
 import com.ticketrush.backend.entity.User;
 import com.ticketrush.backend.entity.Zone;
+import com.ticketrush.backend.repository.BookingRepository;
+import com.ticketrush.backend.repository.BookingSeatRepository;
 import com.ticketrush.backend.repository.EventRepository;
+import com.ticketrush.backend.repository.TicketRepository;
 import com.ticketrush.backend.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +32,11 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @Component
 @ConditionalOnProperty(name = "demo-data.ticketbox-events.enabled", havingValue = "true")
@@ -48,6 +56,9 @@ public class DemoEventDataInitializer implements CommandLineRunner {
 
     EventRepository eventRepository;
     UserRepository userRepository;
+    BookingRepository bookingRepository;
+    BookingSeatRepository bookingSeatRepository;
+    TicketRepository ticketRepository;
 
     @Override
     @Transactional
@@ -118,8 +129,16 @@ public class DemoEventDataInitializer implements CommandLineRunner {
             return;
         }
 
-        eventRepository.saveAll(eventsToSave);
-        log.info("Created {} and updated {} TicketBox demo events", createdCount, updatedCount);
+        List<Event> savedEvents = eventRepository.saveAllAndFlush(eventsToSave);
+        DemoBookingSyncResult bookingSyncResult = syncDemoBookings(savedEvents);
+        log.info(
+                "Created {} and updated {} TicketBox demo events. Converted {} locked seats to sold and created {} confirmed demo bookings for {} seats",
+                createdCount,
+                updatedCount,
+                bookingSyncResult.convertedLockedSeats(),
+                bookingSyncResult.createdBookings(),
+                bookingSyncResult.backfilledSeats()
+        );
     }
 
     private LocalDateTime parseTicketBoxTime(String value) {
@@ -188,6 +207,162 @@ public class DemoEventDataInitializer implements CommandLineRunner {
         }
     }
 
+    private DemoBookingSyncResult syncDemoBookings(List<Event> events) {
+        List<User> buyers = demoBuyers();
+        if (buyers.isEmpty()) {
+            log.warn("Skipped demo booking backfill because no users exist");
+            return new DemoBookingSyncResult(0, 0, 0);
+        }
+
+        int convertedLockedSeats = 0;
+        int backfilledSeats = 0;
+        int createdBookings = 0;
+        Set<Integer> confirmedExistingBookingIds = new HashSet<>();
+        List<Booking> bookingsToCreate = new ArrayList<>();
+
+        for (Event event : events) {
+            List<Seat> soldSeatsWithoutBooking = new ArrayList<>();
+            Random random = new Random(20260515L + event.getTitle().hashCode());
+
+            for (Zone zone : event.getZones()) {
+                for (Seat seat : zone.getSeats()) {
+                    if (seat.getStatus() == Seat.Status.LOCKED) {
+                        seat.setStatus(Seat.Status.SOLD);
+                        convertedLockedSeats++;
+                    }
+
+                    if (seat.getStatus() != Seat.Status.SOLD) {
+                        continue;
+                    }
+
+                    var bookingSeat = bookingSeatRepository.findFirstBySeatId(seat.getId());
+                    if (bookingSeat.isPresent()) {
+                        Booking booking = bookingSeat.get().getBooking();
+                        if (booking.getStatus() != Booking.Status.CONFIRMED
+                                && confirmedExistingBookingIds.add(booking.getId())) {
+                            confirmExistingBooking(booking);
+                        }
+                        continue;
+                    }
+
+                    soldSeatsWithoutBooking.add(seat);
+                }
+            }
+
+            soldSeatsWithoutBooking.sort(Comparator
+                    .comparing((Seat seat) -> seat.getZone().getId())
+                    .thenComparing(Seat::getRowNumber)
+                    .thenComparing(Seat::getColNumber));
+
+            backfilledSeats += soldSeatsWithoutBooking.size();
+            createdBookings += createDemoBookings(event, buyers, soldSeatsWithoutBooking, random, bookingsToCreate);
+        }
+
+        bookingRepository.saveAll(bookingsToCreate);
+        return new DemoBookingSyncResult(convertedLockedSeats, createdBookings, backfilledSeats);
+    }
+
+    private List<User> demoBuyers() {
+        List<User> allUsers = userRepository.findAll();
+        List<User> customers = allUsers.stream()
+                .filter(user -> user.getRole() == User.Role.CUSTOMER)
+                .toList();
+
+        return customers.isEmpty() ? allUsers : customers;
+    }
+
+    private void confirmExistingBooking(Booking booking) {
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        LocalDateTime issuedAt = booking.getCreatedAt() != null
+                ? booking.getCreatedAt()
+                : LocalDateTime.now(VIETNAM_ZONE);
+
+        booking.setStatus(Booking.Status.CONFIRMED);
+        for (BookingSeat bookingSeat : booking.getBookingSeats()) {
+            Seat seat = bookingSeat.getSeat();
+            seat.setStatus(Seat.Status.SOLD);
+            totalAmount = totalAmount.add(bookingSeat.getPriceAtBooking());
+            createTicketIfMissing(booking, seat, issuedAt);
+        }
+        booking.setTotalAmount(totalAmount);
+    }
+
+    private void createTicketIfMissing(Booking booking, Seat seat, LocalDateTime issuedAt) {
+        if (ticketRepository.existsBySeatId(seat.getId())) {
+            return;
+        }
+
+        ticketRepository.save(Ticket.builder()
+                .booking(booking)
+                .seat(seat)
+                .qrCode(demoQrCode(seat))
+                .status(Ticket.Status.ACTIVE)
+                .issuedAt(issuedAt)
+                .build());
+    }
+
+    private int createDemoBookings(
+            Event event,
+            List<User> buyers,
+            List<Seat> soldSeats,
+            Random random,
+            List<Booking> bookingsToCreate
+    ) {
+        int createdBookings = 0;
+        int index = 0;
+
+        while (index < soldSeats.size()) {
+            int seatCount = 1 + random.nextInt(4);
+            int endExclusive = Math.min(index + seatCount, soldSeats.size());
+            LocalDateTime createdAt = randomBookingTime(event, random);
+            Booking booking = Booking.builder()
+                    .user(buyers.get(random.nextInt(buyers.size())))
+                    .event(event)
+                    .status(Booking.Status.CONFIRMED)
+                    .expiresAt(createdAt.plusMinutes(10))
+                    .createdAt(createdAt)
+                    .bookingSeats(new ArrayList<>())
+                    .tickets(new ArrayList<>())
+                    .build();
+
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            for (Seat seat : soldSeats.subList(index, endExclusive)) {
+                BookingSeat bookingSeat = BookingSeat.builder()
+                        .booking(booking)
+                        .seat(seat)
+                        .priceAtBooking(seat.getZone().getPrice())
+                        .build();
+                Ticket ticket = Ticket.builder()
+                        .booking(booking)
+                        .seat(seat)
+                        .qrCode(demoQrCode(seat))
+                        .status(Ticket.Status.ACTIVE)
+                        .issuedAt(createdAt)
+                        .build();
+
+                booking.getBookingSeats().add(bookingSeat);
+                booking.getTickets().add(ticket);
+                totalAmount = totalAmount.add(bookingSeat.getPriceAtBooking());
+            }
+
+            booking.setTotalAmount(totalAmount);
+            bookingsToCreate.add(booking);
+            createdBookings++;
+            index = endExclusive;
+        }
+
+        return createdBookings;
+    }
+
+    private LocalDateTime randomBookingTime(Event event, Random random) {
+        LocalDateTime now = LocalDateTime.now(VIETNAM_ZONE);
+        LocalDateTime latest = event.getStartTime().isBefore(now)
+                ? event.getStartTime().minusHours(1)
+                : now.minusHours(1);
+
+        return latest.minusHours(1 + random.nextInt(24 * 30));
+    }
+
     private long roundPrice(long value) {
         return Math.round(value / 10_000.0) * 10_000L;
     }
@@ -211,10 +386,18 @@ public class DemoEventDataInitializer implements CommandLineRunner {
         if (roll < 72) {
             return Seat.Status.AVAILABLE;
         }
-        if (roll < 88) {
-            return Seat.Status.SOLD;
-        }
-        return Seat.Status.LOCKED;
+        return Seat.Status.SOLD;
+    }
+
+    private String demoQrCode(Seat seat) {
+        return "DEMO-E" + seat.getZone().getEvent().getId() + "-S" + seat.getId();
+    }
+
+    record DemoBookingSyncResult(
+            int convertedLockedSeats,
+            int createdBookings,
+            int backfilledSeats
+    ) {
     }
 
     record TicketBoxEventSeed(
