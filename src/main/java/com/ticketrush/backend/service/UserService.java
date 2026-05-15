@@ -6,6 +6,7 @@ import com.ticketrush.backend.entity.User;
 import com.ticketrush.backend.exception.AppException;
 import com.ticketrush.backend.exception.ErrorCode;
 import com.ticketrush.backend.mapper.UserMapper;
+import com.ticketrush.backend.repository.BookingRepository;
 import com.ticketrush.backend.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +15,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
     UserRepository userRepository;
+    BookingRepository bookingRepository;
     UserMapper userMapper;
     CloudinaryService cloudinaryService;
 
@@ -58,5 +62,20 @@ public class UserService {
         userRepository.save(user);
 
         return userMapper.toUserResponse(user);
+    }
+
+    public BigDecimal getMyTotalSpending(UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        return bookingRepository.sumTotalSpendingByUserId(user.getId());
+    }
+
+    public BigDecimal getUserTotalSpending(Integer userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        return bookingRepository.sumTotalSpendingByUserId(userId);
     }
 }

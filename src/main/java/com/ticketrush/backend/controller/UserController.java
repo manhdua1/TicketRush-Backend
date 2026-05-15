@@ -4,6 +4,7 @@ import com.ticketrush.backend.dto.request.UserUpdateRequest;
 import com.ticketrush.backend.dto.response.ApiResponse;
 import com.ticketrush.backend.dto.response.UserResponse;
 import com.ticketrush.backend.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -14,6 +15,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.math.BigDecimal;
 
 @Tag(name = "Users", description = "Quản lý người dùng")
 @RestController
@@ -40,5 +43,17 @@ public class UserController {
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal UserDetails userDetails) {
         return ApiResponse.success(userService.uploadAvatar(file, userDetails));
+    }
+
+    @Operation(summary = "Tong chi tieu cua user dang dang nhap")
+    @GetMapping("/my-spending")
+    public ApiResponse<BigDecimal> getMyTotalSpending(@AuthenticationPrincipal UserDetails userDetails) {
+        return ApiResponse.success(userService.getMyTotalSpending(userDetails));
+    }
+
+    @Operation(summary = "Tong chi tieu cua mot user theo id (Admin)")
+    @GetMapping("/admin/users/{userId}/total-spending")
+    public ApiResponse<BigDecimal> getUserTotalSpending(@PathVariable Integer userId) {
+        return ApiResponse.success(userService.getUserTotalSpending(userId));
     }
 }
