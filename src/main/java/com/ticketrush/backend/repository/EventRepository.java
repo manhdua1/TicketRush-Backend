@@ -14,6 +14,8 @@ import java.util.Optional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Integer>, JpaSpecificationExecutor<Event> {
+    Optional<Event> findFirstByTitle(String title);
+
     @Query("SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.zones WHERE e.status = :status ORDER BY e.startTime ASC")
     List<Event> findByStatusOrderByEventDateAsc(@Param("status") Event.Status status);
 
