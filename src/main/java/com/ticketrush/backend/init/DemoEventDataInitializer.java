@@ -74,14 +74,22 @@ public class DemoEventDataInitializer implements CommandLineRunner {
                 endTime = startTime.plusHours(3);
             }
 
-            var existingEvent = eventRepository.findByTitleAndStartTime(seed.title(), startTime);
+            Event.Status status = endTime.isBefore(LocalDateTime.now(VIETNAM_ZONE))
+                    ? Event.Status.ENDED
+                    : Event.Status.ON_SALE;
+            Event.Type type = mapType(seed.categories());
+            var existingEvent = eventRepository.findFirstByTitle(seed.title());
             if (existingEvent.isPresent()) {
                 Event event = existingEvent.get();
-                if (!description.equals(event.getDescription())) {
-                    event.setDescription(description);
-                    eventsToSave.add(event);
-                    updatedCount++;
-                }
+                event.setDescription(description);
+                event.setVenue(seed.venue());
+                event.setStartTime(startTime);
+                event.setEndTime(endTime);
+                event.setPosterUrl(seed.posterUrl());
+                event.setStatus(status);
+                event.setType(type);
+                eventsToSave.add(event);
+                updatedCount++;
                 continue;
             }
 
@@ -93,11 +101,11 @@ public class DemoEventDataInitializer implements CommandLineRunner {
                     .endTime(endTime)
                     .posterUrl(seed.posterUrl())
                     .spotlight(i == 0 && eventRepository.findFirstBySpotlightTrueOrderByStartTimeAsc().isEmpty())
-                    .status(endTime.isBefore(LocalDateTime.now(VIETNAM_ZONE)) ? Event.Status.ENDED : Event.Status.ON_SALE)
+                    .status(status)
                     .createdBy(admin)
                     .createdAt(LocalDateTime.now(VIETNAM_ZONE))
                     .zones(new HashSet<>())
-                    .type(mapType(seed.categories()))
+                    .type(type)
                     .build();
 
             attachZones(event, seed, i);
