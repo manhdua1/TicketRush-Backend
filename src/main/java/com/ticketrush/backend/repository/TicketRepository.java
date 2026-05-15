@@ -12,4 +12,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     List<Ticket> findByBookingUserId(Integer userId);
 
     Optional<Ticket> findByQrCode(String qrCode);
+
+    boolean existsBySeatId(Integer seatId);
 }
