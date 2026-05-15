@@ -58,6 +58,12 @@ public class EventController {
        return ApiResponse.success(eventResponse);
     }
 
+    @Operation(summary = "Lấy tất cả sự kiện (mọi trạng thái)")
+    @GetMapping("/admin/events")
+    public ApiResponse<List<EventResponse>> getAllEvents() {
+        return ApiResponse.success(eventService.getAllEvents());
+    }
+
     @Operation(summary = "Lấy sự kiện đang mở bán")
     @GetMapping("/events/on-sale")
     public ApiResponse<List<EventResponse>> getOnSaleEvents() {
