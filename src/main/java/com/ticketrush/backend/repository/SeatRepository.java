@@ -1,5 +1,6 @@
 package com.ticketrush.backend.repository;
 
+import com.ticketrush.backend.entity.Event;
 import com.ticketrush.backend.entity.Seat;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +26,9 @@ public interface SeatRepository extends JpaRepository<Seat, Integer> {
 
     @Query("SELECT COUNT(s) FROM Seat s WHERE s.zone.event.id = :eventId AND s.status = :status")
     Integer countByEventIdAndStatus(Integer eventId, Seat.Status status);
+
+    @Query("SELECT COUNT(s) FROM Seat s WHERE s.zone.event.status = :eventStatus AND s.status = :seatStatus")
+    Long countByEventStatusAndStatus(Event.Status eventStatus, Seat.Status seatStatus);
 
     @Query("SELECT COUNT(s) FROM Seat s WHERE s.zone.id = :zoneId AND s.status = :status")
     Integer countByZoneIdAndStatus(Integer zoneId, Seat.Status status);
