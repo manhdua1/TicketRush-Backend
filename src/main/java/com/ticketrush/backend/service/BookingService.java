@@ -142,6 +142,7 @@ public class BookingService {
                     .seat(seat)
                     .qrCode(UUID.randomUUID().toString())
                     .status(Ticket.Status.ACTIVE)
+                    .issuedAt(LocalDateTime.now())
                     .build();
             ticketRepository.save(ticket);
         });
