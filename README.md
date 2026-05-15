@@ -71,3 +71,6 @@ src/main/java/com/ticketrush/backend
 
 # API Documentation
 Swagger UI: http://localhost:8080/swagger-ui.html
+
+# Requirement
+https://drive.google.com/file/d/1OEZBD5f_eg3mrWTQSNm7Rhdu5Xlsh9vQ/view?usp=sharing
