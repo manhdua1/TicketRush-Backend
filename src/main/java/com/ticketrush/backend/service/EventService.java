@@ -159,7 +159,7 @@ public class EventService {
     }
 
     public List<EventResponse> getTrendingEvents() {
-        return eventRepository.findTrendingEvents(5)
+        return eventRepository.findTrendingEvents(6)
                 .stream()
                 .map(eventMapper::toEventResponse)
                 .toList();
