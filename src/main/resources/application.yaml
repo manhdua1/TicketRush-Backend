@@ -63,6 +63,10 @@ cloudinary:
 otp:
   expiration: 120 # 2 phút
 
+demo-data:
+  ticketbox-events:
+    enabled: ${DEMO_TICKETBOX_EVENTS_ENABLED:true}
+
 # Cấu hình hàng chờ ảo
 queue:
   threshold: 10         # Số user đồng thời để kích hoạt hàng chờ (set thấp để test)
