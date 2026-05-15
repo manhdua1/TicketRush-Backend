@@ -1,10 +1,32 @@
-# Frontend Github Repo:
-https://github.com/HieuPD123/TicketRush-Frontend
+# Overview
+
+TicketRush Backend is a Spring Boot API for event discovery, ticket booking, virtual queue management, seat locking, ticket issuing, and admin analytics.
+
+# Main Features
+
+- Authentication with OTP email verification
+- JWT authentication stored in an httpOnly cookie
+- Event listing, search, spotlight, trending, and admin event management
+- Zone and seat management
+- Seat locking and booking confirmation
+- Virtual queue for high-traffic events
+- Ticket lookup by QR code
+- Realtime seat updates via WebSocket
+- Admin revenue, audience, and ticket statistics
+- Demo users and demo events seeding
 
 # Tech Stack
 * Build tool: Maven >= 3.9.5
 * Java: 21
 * Framework: Spring Boot 4.0.5
+
+# Demo Accounts
+The application seeds these accounts automatically:
+- Email: admin@ticketrush.com Password: admin123
+- Email: user1@gmail.com - user200@gmail.com Password 123456
+
+# Frontend Github Repo:
+https://github.com/HieuPD123/TicketRush-Frontend
 
 # How to run
 You **do not** need to install Java, Maven, or MySQL on your local machine. You only need to have **Docker** and Docker Compose installed.
@@ -29,5 +51,23 @@ To stop the system:
 
 `docker compose down`
 
-## API Documentation
+# Project Structure
+
+```txt
+src/main/java/com/ticketrush/backend
+├── config        # Security, CORS, Redis, WebSocket, Cloudinary
+├── controller    # REST controllers
+├── dto           # Request/response DTOs
+├── entity        # JPA entities
+├── exception     # Error handling
+├── init          # Demo data seeders
+├── mapper        # MapStruct mappers
+├── repository    # Spring Data repositories
+├── scheduler     # Booking/event background jobs
+├── security      # JWT service
+├── service       # Business logic
+└── util          # Shared utilities
+```
+
+# API Documentation
 Swagger UI: http://localhost:8080/swagger-ui.html
