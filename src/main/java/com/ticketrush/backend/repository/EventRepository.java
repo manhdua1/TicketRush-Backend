@@ -55,4 +55,6 @@ public interface EventRepository extends JpaRepository<Event, Integer>, JpaSpeci
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Event e SET e.status = :endedStatus WHERE e.status <> :endedStatus AND e.endTime < :time")
     int markEndedEvents(@Param("endedStatus") Event.Status endedStatus, @Param("time") LocalDateTime time);
+
+    List<Event> findByStatus(Event.Status status);
 }

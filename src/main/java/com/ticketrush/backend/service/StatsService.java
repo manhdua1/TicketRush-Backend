@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,6 +58,59 @@ public class StatsService {
                 .availableSeats(availableSeats)
                 .occupancyRate(occupancyRate)
                 .zoneStats(zoneStats)
+                .build();
+    }
+
+    public BigDecimal getAllOnSaleEventsRevenue() {
+        List<Event> events = eventRepository.findByStatus(Event.Status.ON_SALE);
+
+        return events.stream()
+                .map(event -> bookingRepository.sumRevenueByEventId(event.getId()))
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public Long getAllOnSaleEventsSoldTickets() {
+        return seatRepository.countByEventStatusAndStatus(Event.Status.ON_SALE, Seat.Status.SOLD);
+    }
+
+    public List<OnSaleLowTicketEventResponse> getLowTicketOnSaleEvents() {
+        return eventRepository.findByStatus(Event.Status.ON_SALE).stream()
+                .map(this::buildLowTicketOnSaleEventResponse)
+                .filter(this::isLowTicketEvent)
+                .sorted(Comparator
+                        .comparingDouble(OnSaleLowTicketEventResponse::getRemainingRate)
+                        .thenComparing(OnSaleLowTicketEventResponse::getStartTime))
+                .toList();
+    }
+
+    private boolean isLowTicketEvent(OnSaleLowTicketEventResponse response) {
+        return response.getTotalTickets() > 0
+                && (long) response.getRemainingTickets() * 10 < response.getTotalTickets();
+    }
+
+    private OnSaleLowTicketEventResponse buildLowTicketOnSaleEventResponse(Event event) {
+        Integer eventId = event.getId();
+        Integer totalTickets = seatRepository.countTotalByEventId(eventId);
+        Integer soldTickets = seatRepository.countByEventIdAndStatus(eventId, Seat.Status.SOLD);
+        Integer lockedTickets = seatRepository.countByEventIdAndStatus(eventId, Seat.Status.LOCKED);
+        Integer remainingTickets = seatRepository.countByEventIdAndStatus(eventId, Seat.Status.AVAILABLE);
+        double remainingRate = totalTickets > 0
+                ? Math.round((double) remainingTickets / totalTickets * 100 * 10.0) / 10.0
+                : 0;
+
+        return OnSaleLowTicketEventResponse.builder()
+                .eventId(eventId)
+                .eventTitle(event.getTitle())
+                .venue(event.getVenue())
+                .startTime(event.getStartTime())
+                .endTime(event.getEndTime())
+                .posterUrl(event.getPosterUrl())
+                .totalTickets(totalTickets)
+                .soldTickets(soldTickets)
+                .lockedTickets(lockedTickets)
+                .remainingTickets(remainingTickets)
+                .remainingRate(remainingRate)
                 .build();
     }
 
