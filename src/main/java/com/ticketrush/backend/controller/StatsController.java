@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+
 @Tag(name = "Admin Stats", description = "Thống kê dành cho Admin")
 @RestController
 @RequestMapping("/api/admin/events")
@@ -35,5 +37,10 @@ public class StatsController {
     public ApiResponse<AudienceStatsResponse> getAudienceStats(
             @PathVariable Integer id) {
         return ApiResponse.success(statsService.getAudienceStats(id));
+    }
+
+    @GetMapping("/on-sale-revenue")
+    public ApiResponse<BigDecimal> getAllOnSaleEventsRevenue() {
+        return ApiResponse.success(statsService.getAllOnSaleEventsRevenue());
     }
 }

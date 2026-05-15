@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,6 +59,15 @@ public class StatsService {
                 .occupancyRate(occupancyRate)
                 .zoneStats(zoneStats)
                 .build();
+    }
+
+    public BigDecimal getAllOnSaleEventsRevenue() {
+        List<Event> events = eventRepository.findByStatus(Event.Status.ON_SALE);
+
+        return events.stream()
+                .map(event -> bookingRepository.sumRevenueByEventId(event.getId()))
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private ZoneStatsResponse buildZoneStats(Zone zone) {
