@@ -164,4 +164,11 @@ public class EventService {
                 .map(eventMapper::toEventResponse)
                 .toList();
     }
+
+    public List<EventResponse> getAllEvents() {
+        return eventRepository.findAll()
+                .stream()
+                .map(eventMapper::toEventResponse)
+                .toList();
+    }
 }
