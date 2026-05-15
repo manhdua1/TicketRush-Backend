@@ -127,7 +127,7 @@ public class EventController {
         return ApiResponse.success(eventService.searchEvents(name, type, dstfrom, dstto, page, size));
     }
 
-    @Operation(summary = "Lấy 5 sự kiện có tỉ lệ đặt ghế cao nhất")
+    @Operation(summary = "Lấy 6 sự kiện có tỉ lệ đặt ghế cao nhất")
     @GetMapping("/events/trending")
     public ApiResponse<List<EventResponse>> getTrendingEvents() {
         return ApiResponse.success(eventService.getTrendingEvents());
