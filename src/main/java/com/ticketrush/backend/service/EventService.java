@@ -149,7 +149,11 @@ public class EventService {
     }
 
     public PageResponse<EventResponse> searchEvents(String name, Event.Type type, LocalDateTime dstfrom, LocalDateTime dstto, int page, int size) {
-        Pageable pageable = PageRequest.of(Math.max(0, page - 1), size, Sort.by("startTime").ascending());
+        Pageable pageable = PageRequest.of(
+                Math.max(0, page - 1),
+                size,
+                Sort.by(Sort.Order.asc("startTime"), Sort.Order.asc("id"))
+        );
         Specification<Event> spec = EventSpecification.filter(name, type, dstfrom, dstto);
 
         Page<EventResponse> result = eventRepository.findAll(spec, pageable)
