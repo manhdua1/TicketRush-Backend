@@ -23,7 +23,7 @@ TicketRush Backend is a Spring Boot API for event discovery, ticket booking, vir
 # Demo Accounts
 The application seeds these accounts automatically:
 - Email: admin@ticketrush.com Password: admin123
-- Email: user1@gmail.com - user200@gmail.com Password 123456
+- Email: user1@gmail.com - user200@gmail.com Password: 123456
 
 # Frontend Github Repo:
 https://github.com/HieuPD123/TicketRush-Frontend
