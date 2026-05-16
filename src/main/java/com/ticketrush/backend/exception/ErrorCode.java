@@ -50,7 +50,8 @@ public enum ErrorCode {
     QUEUE_TOKEN_NOT_FOUND(1037, "Token hàng chờ không tồn tại", HttpStatus.NOT_FOUND),
     NOT_IN_QUEUE(1038, "Bạn chưa có quyền vào đặt vé", HttpStatus.FORBIDDEN),
     QUEUE_TOKEN_REQUIRED(1039, "Queue Token không được để trống", HttpStatus.BAD_REQUEST),
-    SPOTLIGHT_REQUIRED(1040, "Spotlight không được để trống", HttpStatus.BAD_REQUEST)
+    SPOTLIGHT_REQUIRED(1040, "Spotlight không được để trống", HttpStatus.BAD_REQUEST),
+    GEOCODING_FAILED(1041, "Khong the lay toa do tu dia diem", HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
