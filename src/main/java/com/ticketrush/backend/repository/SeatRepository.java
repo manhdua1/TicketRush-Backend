@@ -30,6 +30,9 @@ public interface SeatRepository extends JpaRepository<Seat, Integer> {
     @Query("SELECT COUNT(s) FROM Seat s WHERE s.zone.event.status = :eventStatus AND s.status = :seatStatus")
     Long countByEventStatusAndStatus(Event.Status eventStatus, Seat.Status seatStatus);
 
+    @Query("SELECT COUNT(s) FROM Seat s WHERE s.zone.event.status = :eventStatus")
+    Long countByEventStatus(Event.Status eventStatus);
+
     @Query("SELECT COUNT(s) FROM Seat s WHERE s.zone.id = :zoneId AND s.status = :status")
     Integer countByZoneIdAndStatus(Integer zoneId, Seat.Status status);
 

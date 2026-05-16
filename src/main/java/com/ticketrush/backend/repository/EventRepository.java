@@ -57,4 +57,6 @@ public interface EventRepository extends JpaRepository<Event, Integer>, JpaSpeci
     int markEndedEvents(@Param("endedStatus") Event.Status endedStatus, @Param("time") LocalDateTime time);
 
     List<Event> findByStatus(Event.Status status);
+
+    Long countByStatus(Event.Status status);
 }

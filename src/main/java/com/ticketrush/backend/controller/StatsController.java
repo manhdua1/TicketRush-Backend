@@ -5,6 +5,7 @@ import com.ticketrush.backend.dto.response.ApiResponse;
 import com.ticketrush.backend.dto.response.AudienceStatsResponse;
 import com.ticketrush.backend.dto.response.EventStatsResponse;
 import com.ticketrush.backend.dto.response.OnSaleLowTicketEventResponse;
+import com.ticketrush.backend.dto.response.OnSaleSeatSummaryResponse;
 import com.ticketrush.backend.dto.response.RevenueTrendResponse;
 import com.ticketrush.backend.service.StatsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +54,18 @@ public class StatsController {
     @GetMapping("/on-sale-sold-tickets")
     public ApiResponse<Long> getAllOnSaleEventsSoldTickets() {
         return ApiResponse.success(statsService.getAllOnSaleEventsSoldTickets());
+    }
+
+    @Operation(summary = "So ghe SOLD tren tong so ghe cua cac su kien ON_SALE")
+    @GetMapping("/on-sale-seat-summary")
+    public ApiResponse<OnSaleSeatSummaryResponse> getOnSaleSeatSummary() {
+        return ApiResponse.success(statsService.getOnSaleSeatSummary());
+    }
+
+    @Operation(summary = "So su kien dang ON_SALE")
+    @GetMapping("/on-sale-count")
+    public ApiResponse<Long> getOnSaleEventCount() {
+        return ApiResponse.success(statsService.getOnSaleEventCount());
     }
 
     @Operation(summary = "Bien dong doanh thu theo 1 ngay, 7 ngay hoac 1 thang")

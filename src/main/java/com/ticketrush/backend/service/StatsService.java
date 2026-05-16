@@ -96,6 +96,24 @@ public class StatsService {
         return seatRepository.countByEventStatusAndStatus(Event.Status.ON_SALE, Seat.Status.SOLD);
     }
 
+    public OnSaleSeatSummaryResponse getOnSaleSeatSummary() {
+        Long soldSeats = seatRepository.countByEventStatusAndStatus(Event.Status.ON_SALE, Seat.Status.SOLD);
+        Long totalSeats = seatRepository.countByEventStatus(Event.Status.ON_SALE);
+        double soldRate = totalSeats > 0
+                ? Math.round((double) soldSeats / totalSeats * 100 * 10.0) / 10.0
+                : 0;
+
+        return OnSaleSeatSummaryResponse.builder()
+                .soldSeats(soldSeats)
+                .totalSeats(totalSeats)
+                .soldRate(soldRate)
+                .build();
+    }
+
+    public Long getOnSaleEventCount() {
+        return eventRepository.countByStatus(Event.Status.ON_SALE);
+    }
+
     public RevenueTrendResponse getRevenueTrend(RevenueTrendPeriod period) {
         RevenueTrendPeriod resolvedPeriod = period == null ? RevenueTrendPeriod.DAY : period;
         LocalDateTime now = LocalDateTime.now(zoneId);
