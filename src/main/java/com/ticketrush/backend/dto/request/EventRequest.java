@@ -31,9 +31,6 @@ public class EventRequest {
     @NotNull(message = "EVENT_DATE_REQUIRED")
     LocalDateTime endTime;
 
-    Double longitude;
-    Double latitude;
-
     @NotNull(message = "EVENT_TYPE_REQUIRED")
     Event.Type type;
 

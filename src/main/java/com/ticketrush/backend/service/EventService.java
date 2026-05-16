@@ -34,17 +34,19 @@ public class EventService {
     UserRepository userRepository;
     EventMapper eventMapper;
     QueueService queueService;
+    GeocodingService geocodingService;
 
     public EventResponse createEvent(EventRequest request, Integer adminId) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        GeocodingService.Coordinates coordinates = geocodingService.geocode(request.getVenue());
 
         Event event = Event.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .venue(request.getVenue())
-                .longitude(request.getLongitude())
-                .latitude(request.getLatitude())
+                .longitude(resolveLongitude(coordinates))
+                .latitude(resolveLatitude(coordinates))
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
                 .posterUrl(request.getPosterUrl())
@@ -64,8 +66,9 @@ public class EventService {
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
         event.setVenue(request.getVenue());
-        event.setLatitude(request.getLatitude());
-        event.setLongitude(request.getLongitude());
+        GeocodingService.Coordinates coordinates = geocodingService.geocode(request.getVenue());
+        event.setLatitude(resolveLatitude(coordinates));
+        event.setLongitude(resolveLongitude(coordinates));
         event.setStartTime(request.getStartTime());
         event.setEndTime(request.getEndTime());
         event.setPosterUrl(request.getPosterUrl());
@@ -174,5 +177,13 @@ public class EventService {
                 .stream()
                 .map(eventMapper::toEventResponse)
                 .toList();
+    }
+
+    private Double resolveLatitude(GeocodingService.Coordinates coordinates) {
+        return coordinates == null ? null : coordinates.latitude();
+    }
+
+    private Double resolveLongitude(GeocodingService.Coordinates coordinates) {
+        return coordinates == null ? null : coordinates.longitude();
     }
 }
