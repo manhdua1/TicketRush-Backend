@@ -30,6 +30,7 @@ public class Booking {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     Status status = Status.PENDING;
 
     @Column(name = "total_amount", precision = 12, scale = 0)
@@ -39,13 +40,23 @@ public class Booking {
     LocalDateTime expiresAt;
 
     @Column(name = "created_at", updatable = false)
+    @Builder.Default
     LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+    @Builder.Default
     List<BookingSeat> bookingSeats = new ArrayList<>();
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+    @Builder.Default
     List<Ticket> tickets = new ArrayList<>();
 
     public enum Status { PENDING, CONFIRMED, EXPIRED, CANCELLED }
+
+    @PrePersist
+    void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }
