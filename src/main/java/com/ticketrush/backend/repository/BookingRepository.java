@@ -24,6 +24,14 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     BigDecimal sumTotalSpendingByUserId(Integer userId);
 
     @Query("""
+    SELECT b FROM Booking b
+    WHERE b.status = 'CONFIRMED'
+    AND b.createdAt >= :from
+    AND b.createdAt < :to
+    """)
+    List<Booking> findConfirmedBookingsBetween(LocalDateTime from, LocalDateTime to);
+
+    @Query("""
     SELECT COALESCE(SUM(bs.priceAtBooking), 0)
     FROM BookingSeat bs
     WHERE bs.seat.zone.id = :zoneId
