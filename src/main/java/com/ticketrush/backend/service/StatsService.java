@@ -1,6 +1,8 @@
 package com.ticketrush.backend.service;
 
+import com.ticketrush.backend.dto.request.RevenueTrendPeriod;
 import com.ticketrush.backend.dto.response.*;
+import com.ticketrush.backend.entity.Booking;
 import com.ticketrush.backend.entity.Event;
 import com.ticketrush.backend.entity.Seat;
 import com.ticketrush.backend.entity.User;
@@ -12,23 +14,43 @@ import com.ticketrush.backend.repository.EventRepository;
 import com.ticketrush.backend.repository.SeatRepository;
 import com.ticketrush.backend.repository.ZoneRepository;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StatsService {
+    static final DateTimeFormatter HOUR_LABEL_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    static final DateTimeFormatter DAY_LABEL_FORMATTER = DateTimeFormatter.ofPattern("dd/MM");
+
     EventRepository eventRepository;
     ZoneRepository zoneRepository;
     SeatRepository seatRepository;
     BookingRepository bookingRepository;
+    ZoneId zoneId;
+
+    public StatsService(
+            EventRepository eventRepository,
+            ZoneRepository zoneRepository,
+            SeatRepository seatRepository,
+            BookingRepository bookingRepository,
+            @Value("${spring.jackson.time-zone:Asia/Ho_Chi_Minh}") String timeZone
+    ) {
+        this.eventRepository = eventRepository;
+        this.zoneRepository = zoneRepository;
+        this.seatRepository = seatRepository;
+        this.bookingRepository = bookingRepository;
+        this.zoneId = ZoneId.of(timeZone);
+    }
 
     public EventStatsResponse getEventStats(Integer eventId) {
         Event event = eventRepository.findByIdWithZones(eventId)
@@ -72,6 +94,38 @@ public class StatsService {
 
     public Long getAllOnSaleEventsSoldTickets() {
         return seatRepository.countByEventStatusAndStatus(Event.Status.ON_SALE, Seat.Status.SOLD);
+    }
+
+    public RevenueTrendResponse getRevenueTrend(RevenueTrendPeriod period) {
+        RevenueTrendPeriod resolvedPeriod = period == null ? RevenueTrendPeriod.DAY : period;
+        LocalDateTime now = LocalDateTime.now(zoneId);
+        List<RevenueBucket> buckets = buildRevenueBuckets(resolvedPeriod, now);
+        LocalDateTime from = buckets.getFirst().startTime();
+        LocalDateTime to = buckets.getLast().endTime();
+
+        List<Booking> bookings = bookingRepository.findConfirmedBookingsBetween(from, to);
+        for (Booking booking : bookings) {
+            addBookingRevenueToBucket(buckets, booking);
+        }
+
+        List<RevenueTrendPointResponse> points = buckets.stream()
+                .map(bucket -> RevenueTrendPointResponse.builder()
+                        .label(bucket.label())
+                        .startTime(bucket.startTime())
+                        .endTime(bucket.endTime())
+                        .revenue(bucket.revenue())
+                        .build())
+                .toList();
+
+        BigDecimal totalRevenue = points.stream()
+                .map(RevenueTrendPointResponse::getRevenue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return RevenueTrendResponse.builder()
+                .period(resolvedPeriod.name())
+                .totalRevenue(totalRevenue)
+                .points(points)
+                .build();
     }
 
     public List<OnSaleLowTicketEventResponse> getLowTicketOnSaleEvents() {
@@ -138,6 +192,83 @@ public class StatsService {
                 .occupancyRate(occupancyRate)
                 .revenue(revenue)
                 .build();
+    }
+
+    private List<RevenueBucket> buildRevenueBuckets(RevenueTrendPeriod period, LocalDateTime now) {
+        return switch (period) {
+            case DAY -> buildHourlyBuckets(now);
+            case WEEK -> buildDailyBuckets(now.toLocalDate().minusDays(6), 7);
+            case MONTH -> buildDailyBuckets(now.toLocalDate().minusDays(29), 30);
+        };
+    }
+
+    private List<RevenueBucket> buildHourlyBuckets(LocalDateTime now) {
+        LocalDateTime firstHour = now.withMinute(0).withSecond(0).withNano(0).minusHours(23);
+        List<RevenueBucket> buckets = new ArrayList<>();
+        for (int i = 0; i < 24; i++) {
+            LocalDateTime start = firstHour.plusHours(i);
+            LocalDateTime end = start.plusHours(1);
+            buckets.add(new RevenueBucket(start.format(HOUR_LABEL_FORMATTER), start, end));
+        }
+        return buckets;
+    }
+
+    private List<RevenueBucket> buildDailyBuckets(LocalDate firstDate, int days) {
+        List<RevenueBucket> buckets = new ArrayList<>();
+        for (int i = 0; i < days; i++) {
+            LocalDate date = firstDate.plusDays(i);
+            LocalDateTime start = date.atStartOfDay();
+            LocalDateTime end = start.plusDays(1);
+            buckets.add(new RevenueBucket(date.format(DAY_LABEL_FORMATTER), start, end));
+        }
+        return buckets;
+    }
+
+    private void addBookingRevenueToBucket(List<RevenueBucket> buckets, Booking booking) {
+        if (booking.getCreatedAt() == null || booking.getTotalAmount() == null) {
+            return;
+        }
+
+        for (RevenueBucket bucket : buckets) {
+            if (!booking.getCreatedAt().isBefore(bucket.startTime())
+                    && booking.getCreatedAt().isBefore(bucket.endTime())) {
+                bucket.addRevenue(booking.getTotalAmount());
+                return;
+            }
+        }
+    }
+
+    private static class RevenueBucket {
+        private final String label;
+        private final LocalDateTime startTime;
+        private final LocalDateTime endTime;
+        private BigDecimal revenue = BigDecimal.ZERO;
+
+        RevenueBucket(String label, LocalDateTime startTime, LocalDateTime endTime) {
+            this.label = label;
+            this.startTime = startTime;
+            this.endTime = endTime;
+        }
+
+        String label() {
+            return label;
+        }
+
+        LocalDateTime startTime() {
+            return startTime;
+        }
+
+        LocalDateTime endTime() {
+            return endTime;
+        }
+
+        BigDecimal revenue() {
+            return revenue;
+        }
+
+        void addRevenue(BigDecimal amount) {
+            revenue = revenue.add(amount);
+        }
     }
 
     public AudienceStatsResponse getAudienceStats(Integer eventId) {

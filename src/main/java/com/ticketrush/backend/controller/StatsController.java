@@ -1,9 +1,11 @@
 package com.ticketrush.backend.controller;
 
+import com.ticketrush.backend.dto.request.RevenueTrendPeriod;
 import com.ticketrush.backend.dto.response.ApiResponse;
 import com.ticketrush.backend.dto.response.AudienceStatsResponse;
 import com.ticketrush.backend.dto.response.EventStatsResponse;
 import com.ticketrush.backend.dto.response.OnSaleLowTicketEventResponse;
+import com.ticketrush.backend.dto.response.RevenueTrendResponse;
 import com.ticketrush.backend.service.StatsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,6 +53,13 @@ public class StatsController {
     @GetMapping("/on-sale-sold-tickets")
     public ApiResponse<Long> getAllOnSaleEventsSoldTickets() {
         return ApiResponse.success(statsService.getAllOnSaleEventsSoldTickets());
+    }
+
+    @Operation(summary = "Bien dong doanh thu theo 1 ngay, 7 ngay hoac 1 thang")
+    @GetMapping("/revenue-trend")
+    public ApiResponse<RevenueTrendResponse> getRevenueTrend(
+            @RequestParam(defaultValue = "DAY") RevenueTrendPeriod period) {
+        return ApiResponse.success(statsService.getRevenueTrend(period));
     }
 
     @Operation(summary = "Cac su kien ON_SALE con it ve duoi 10 phan tram")
