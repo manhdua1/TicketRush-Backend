@@ -63,6 +63,8 @@ public class DemoEventDataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String @NonNull ... args) throws Exception {
+        log.info("TicketBox demo event seeding uses JSON address as Event.venue and manual latitude/longitude");
+
         ClassPathResource resource = new ClassPathResource("ticketbox-demo-events.json");
         List<TicketBoxEventSeed> seeds;
 
@@ -93,7 +95,9 @@ public class DemoEventDataInitializer implements CommandLineRunner {
             if (existingEvent.isPresent()) {
                 Event event = existingEvent.get();
                 event.setDescription(description);
-                event.setVenue(seed.venue());
+                event.setVenue(resolveVenue(seed));
+                event.setLatitude(seed.latitude());
+                event.setLongitude(seed.longitude());
                 event.setStartTime(startTime);
                 event.setEndTime(endTime);
                 event.setPosterUrl(seed.posterUrl());
@@ -107,7 +111,9 @@ public class DemoEventDataInitializer implements CommandLineRunner {
             Event event = Event.builder()
                     .title(seed.title())
                     .description(description)
-                    .venue(seed.venue())
+                    .venue(resolveVenue(seed))
+                    .latitude(seed.latitude())
+                    .longitude(seed.longitude())
                     .startTime(startTime)
                     .endTime(endTime)
                     .posterUrl(seed.posterUrl())
@@ -165,6 +171,13 @@ public class DemoEventDataInitializer implements CommandLineRunner {
             case "attractionsexperiences" -> Event.Type.TOURS_AND_EXPERIENCES;
             default -> Event.Type.OTHER;
         };
+    }
+
+    private String resolveVenue(TicketBoxEventSeed seed) {
+        if (seed.address() == null || seed.address().isBlank()) {
+            return seed.venue();
+        }
+        return seed.address();
     }
 
     private void attachZones(Event event, TicketBoxEventSeed seed, int eventIndex) {
@@ -408,6 +421,8 @@ public class DemoEventDataInitializer implements CommandLineRunner {
             String posterUrl,
             String venue,
             String address,
+            Double latitude,
+            Double longitude,
             String startTime,
             String endTime,
             long minPrice,

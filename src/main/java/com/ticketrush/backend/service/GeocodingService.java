@@ -36,9 +36,8 @@ public class GeocodingService {
     long timeoutMs;
 
     public Coordinates geocode(String venue) {
-        String query = buildQuery(venue);
         URI uri = UriComponentsBuilder.fromUriString(nominatimUrl)
-                .queryParam("q", query)
+                .queryParam("q", buildQuery(venue))
                 .queryParam("format", "json")
                 .queryParam("limit", 1)
                 .queryParam("addressdetails", 0)
