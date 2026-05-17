@@ -1,5 +1,6 @@
 package com.ticketrush.backend.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.ticketrush.backend.entity.Event;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Future;
@@ -35,6 +36,11 @@ public class EventRequest {
     Event.Type type;
 
     String posterUrl;
+
+    @JsonAlias("longtitude")
+    Double longitude;
+
+    Double latitude;
 
     @AssertTrue(message = "INVALID_END_TIME")
     public boolean isEndTimeAfterStartTime() {
