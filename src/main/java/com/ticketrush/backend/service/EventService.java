@@ -39,7 +39,7 @@ public class EventService {
     public EventResponse createEvent(EventRequest request, Integer adminId) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        GeocodingService.Coordinates coordinates = geocodingService.geocode(request.getVenue());
+        GeocodingService.Coordinates coordinates = resolveCoordinates(request);
 
         Event event = Event.builder()
                 .title(request.getTitle())
@@ -66,7 +66,7 @@ public class EventService {
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
         event.setVenue(request.getVenue());
-        GeocodingService.Coordinates coordinates = geocodingService.geocode(request.getVenue());
+        GeocodingService.Coordinates coordinates = resolveCoordinates(request);
         event.setLatitude(resolveLatitude(coordinates));
         event.setLongitude(resolveLongitude(coordinates));
         event.setStartTime(request.getStartTime());
@@ -177,6 +177,14 @@ public class EventService {
                 .stream()
                 .map(eventMapper::toEventResponse)
                 .toList();
+    }
+
+    private GeocodingService.Coordinates resolveCoordinates(EventRequest request) {
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            return new GeocodingService.Coordinates(request.getLatitude(), request.getLongitude());
+        }
+
+        return geocodingService.geocode(request.getVenue());
     }
 
     private Double resolveLatitude(GeocodingService.Coordinates coordinates) {
