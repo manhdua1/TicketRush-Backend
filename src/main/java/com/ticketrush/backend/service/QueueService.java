@@ -63,6 +63,10 @@ public class QueueService {
         return "queue:granted:" + token;
     }
 
+    private String grantedEventKey(Integer eventId) {
+        return "queue:granted:event:" + eventId;
+    }
+
     private String activeUsersKey(Integer eventId) {
         return "event:active:" + eventId;
     }
@@ -89,7 +93,9 @@ public class QueueService {
     }
 
     public boolean isQueueRequired(Integer eventId) {
-        return getActiveUserCount(eventId) >= queueThreshold;
+        return getActiveUserCount(eventId) >= queueThreshold
+                || getQueueSize(eventId) > 0
+                || hasActiveGrantedTokens(eventId);
     }
 
     public Duration getTokenCookieTtl() {
@@ -176,6 +182,7 @@ public class QueueService {
                         .build();
             }
 
+            removeGrantedToken(eventId, token);
             queueToken.setStatus(QueueToken.Status.EXPIRED);
             queueTokenRepository.save(queueToken);
         }
@@ -226,6 +233,7 @@ public class QueueService {
 
         redisTemplate.opsForZSet().remove(queueKey(eventId), token);
         redisTemplate.delete(grantedKey(token));
+        removeGrantedToken(eventId, token);
 
         if (queueToken.getStatus() != QueueToken.Status.EXPIRED) {
             queueToken.setStatus(QueueToken.Status.EXPIRED);
@@ -273,6 +281,8 @@ public class QueueService {
             redisTemplate.opsForValue().set(
                     grantedKey(token), "1",
                     Duration.ofMinutes(grantedTtlMinutes));
+            redisTemplate.opsForSet().add(grantedEventKey(eventId), token);
+            redisTemplate.expire(grantedEventKey(eventId), Duration.ofMinutes(grantedTtlMinutes));
 
             redisTemplate.opsForZSet().remove(queueKey(eventId), token);
 
@@ -367,5 +377,39 @@ public class QueueService {
     private int getQueueSize(Integer eventId) {
         Long size = redisTemplate.opsForZSet().size(queueKey(eventId));
         return size != null ? size.intValue() : 0;
+    }
+
+    private boolean hasActiveGrantedTokens(Integer eventId) {
+        String key = grantedEventKey(eventId);
+        Set<Object> tokens = redisTemplate.opsForSet().members(key);
+        if (tokens == null || tokens.isEmpty()) {
+            redisTemplate.delete(key);
+            return false;
+        }
+
+        boolean hasActiveToken = false;
+        for (Object tokenObj : tokens) {
+            String token = tokenObj.toString();
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(grantedKey(token)))) {
+                hasActiveToken = true;
+            } else {
+                redisTemplate.opsForSet().remove(key, token);
+            }
+        }
+
+        if (!hasActiveToken) {
+            redisTemplate.delete(key);
+        }
+
+        return hasActiveToken;
+    }
+
+    private void removeGrantedToken(Integer eventId, String token) {
+        String key = grantedEventKey(eventId);
+        redisTemplate.opsForSet().remove(key, token);
+        Long remaining = redisTemplate.opsForSet().size(key);
+        if (remaining == null || remaining == 0) {
+            redisTemplate.delete(key);
+        }
     }
 }

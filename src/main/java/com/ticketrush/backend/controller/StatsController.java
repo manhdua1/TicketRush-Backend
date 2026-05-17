@@ -82,7 +82,7 @@ public class StatsController {
         return ApiResponse.success(statsService.getRevenueTrend(period));
     }
 
-    @Operation(summary = "Các sự kiện ON_SALE còn vé ít hơn 10%")
+    @Operation(summary = "Các sự kiện ON_SALE còn vé ít hơn 30%")
     @GetMapping("/on-sale-low-tickets")
     public ApiResponse<List<OnSaleLowTicketEventResponse>> getLowTicketOnSaleEvents() {
         return ApiResponse.success(statsService.getLowTicketOnSaleEvents());
