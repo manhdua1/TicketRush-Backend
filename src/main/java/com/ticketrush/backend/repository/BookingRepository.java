@@ -20,6 +20,9 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     @Query("SELECT COALESCE(SUM(b.totalAmount), 0) FROM Booking b WHERE b.event.id = :eventId AND b.status = 'CONFIRMED'")
     BigDecimal sumRevenueByEventId(Integer eventId);
 
+    @Query("SELECT COALESCE(SUM(b.totalAmount), 0) FROM Booking b WHERE b.status = 'CONFIRMED'")
+    BigDecimal sumTotalRevenue();
+
     @Query("SELECT COALESCE(SUM(b.totalAmount), 0) FROM Booking b WHERE b.user.id = :userId AND b.status = 'CONFIRMED'")
     BigDecimal sumTotalSpendingByUserId(Integer userId);
 

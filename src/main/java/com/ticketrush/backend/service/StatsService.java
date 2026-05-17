@@ -92,6 +92,10 @@ public class StatsService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    public BigDecimal getTotalRevenue() {
+        return bookingRepository.sumTotalRevenue();
+    }
+
     public Long getAllOnSaleEventsSoldTickets() {
         return seatRepository.countByEventStatusAndStatus(Event.Status.ON_SALE, Seat.Status.SOLD);
     }
