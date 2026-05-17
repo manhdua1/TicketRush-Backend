@@ -45,37 +45,44 @@ public class StatsController {
         return ApiResponse.success(statsService.getAudienceStats(id));
     }
 
+    @Operation(summary = "Tổng doanh thu của sự kiện đang ON_SALE")
     @GetMapping("/on-sale-revenue")
     public ApiResponse<BigDecimal> getAllOnSaleEventsRevenue() {
         return ApiResponse.success(statsService.getAllOnSaleEventsRevenue());
     }
 
-    @Operation(summary = "Tong ve da ban cua cac su kien dang ON_SALE")
+    @Operation(summary = "Tổng doanh thu của tất cả sự kiện")
+    @GetMapping("/total-revenue")
+    public ApiResponse<BigDecimal> getTotalRevenue() {
+        return ApiResponse.success(statsService.getTotalRevenue());
+    }
+
+    @Operation(summary = "Tổng vé đã bán của sự kiện ON_SALE")
     @GetMapping("/on-sale-sold-tickets")
     public ApiResponse<Long> getAllOnSaleEventsSoldTickets() {
         return ApiResponse.success(statsService.getAllOnSaleEventsSoldTickets());
     }
 
-    @Operation(summary = "So ghe SOLD tren tong so ghe cua cac su kien ON_SALE")
+    @Operation(summary = "Số ghế SOLD trên tổng số ghế sự kiện ON_SALE")
     @GetMapping("/on-sale-seat-summary")
     public ApiResponse<OnSaleSeatSummaryResponse> getOnSaleSeatSummary() {
         return ApiResponse.success(statsService.getOnSaleSeatSummary());
     }
 
-    @Operation(summary = "So su kien dang ON_SALE")
+    @Operation(summary = "Số sự kiện đang ON_SALE")
     @GetMapping("/on-sale-count")
     public ApiResponse<Long> getOnSaleEventCount() {
         return ApiResponse.success(statsService.getOnSaleEventCount());
     }
 
-    @Operation(summary = "Bien dong doanh thu theo 1 ngay, 7 ngay hoac 1 thang")
+    @Operation(summary = "Biến động doanh thu theo ngày, tuần, tháng")
     @GetMapping("/revenue-trend")
     public ApiResponse<RevenueTrendResponse> getRevenueTrend(
             @RequestParam(defaultValue = "DAY") RevenueTrendPeriod period) {
         return ApiResponse.success(statsService.getRevenueTrend(period));
     }
 
-    @Operation(summary = "Cac su kien ON_SALE con it ve duoi 10 phan tram")
+    @Operation(summary = "Các sự kiện ON_SALE còn vé ít hơn 10%")
     @GetMapping("/on-sale-low-tickets")
     public ApiResponse<List<OnSaleLowTicketEventResponse>> getLowTicketOnSaleEvents() {
         return ApiResponse.success(statsService.getLowTicketOnSaleEvents());

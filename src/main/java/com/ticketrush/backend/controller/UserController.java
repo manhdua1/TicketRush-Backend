@@ -26,18 +26,20 @@ import java.math.BigDecimal;
 public class UserController {
     UserService userService;
 
-
+    @Operation(summary = "Lấy thông tin user")
     @GetMapping("/my-info")
     public ApiResponse<UserResponse> getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
         return ApiResponse.success(userService.getMyInfo(userDetails));
     }
 
+    @Operation(summary = "Cập nhật thông tin user")
     @PostMapping("/my-info")
     public ApiResponse<UserResponse> updateMyInfo(@Valid @RequestBody UserUpdateRequest request,
                                                   @AuthenticationPrincipal UserDetails userDetails) {
         return ApiResponse.success(userService.updateMyInfo(request, userDetails));
     }
 
+    @Operation(summary = "Tải ảnh avatar")
     @PostMapping(value = "/my-info/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<UserResponse> uploadAvatar(
             @RequestParam("file") MultipartFile file,
@@ -45,13 +47,13 @@ public class UserController {
         return ApiResponse.success(userService.uploadAvatar(file, userDetails));
     }
 
-    @Operation(summary = "Tong chi tieu cua user dang dang nhap")
+    @Operation(summary = "Tổng chi tiêu của user đang đăng nhập")
     @GetMapping("/my-spending")
     public ApiResponse<BigDecimal> getMyTotalSpending(@AuthenticationPrincipal UserDetails userDetails) {
         return ApiResponse.success(userService.getMyTotalSpending(userDetails));
     }
 
-    @Operation(summary = "Tong chi tieu cua mot user theo id (Admin)")
+    @Operation(summary = "Tổng chi tiêu của một user (Admin)")
     @GetMapping("/admin/users/{userId}/total-spending")
     public ApiResponse<BigDecimal> getUserTotalSpending(@PathVariable Integer userId) {
         return ApiResponse.success(userService.getUserTotalSpending(userId));

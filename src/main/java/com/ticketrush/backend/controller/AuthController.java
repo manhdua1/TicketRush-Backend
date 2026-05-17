@@ -108,6 +108,7 @@ public class AuthController {
         return ApiResponse.success(null);
     }
 
+    @Operation(summary = "Lấy thông tin đăng nhập của user")
     @GetMapping("/me")
     public ApiResponse<UserDetailsResponse> getMe(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) throw new AppException(ErrorCode.UNAUTHENTICATED);
