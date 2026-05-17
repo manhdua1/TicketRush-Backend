@@ -46,6 +46,8 @@ import java.util.Set;
 @Order(2)
 public class DemoEventDataInitializer implements CommandLineRunner {
     static final ZoneId VIETNAM_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
+    static final int LOW_TICKET_EVENT_COUNT = 7;
+    static final int LOW_TICKET_REMAINING_PERCENT = 20;
     static final ZoneTemplate[] ZONE_TEMPLATES = {
             new ZoneTemplate("Standard", "#2E7D32"),
             new ZoneTemplate("Premium", "#1976D2"),
@@ -136,11 +138,13 @@ public class DemoEventDataInitializer implements CommandLineRunner {
         }
 
         List<Event> savedEvents = eventRepository.saveAllAndFlush(eventsToSave);
+        int lowTicketAdjustedEvents = applyLowTicketDemoInventory(savedEvents);
         DemoBookingSyncResult bookingSyncResult = syncDemoBookings(savedEvents);
         log.info(
-                "Created {} and updated {} TicketBox demo events. Converted {} locked seats to sold and created {} confirmed demo bookings for {} seats",
+                "Created {} and updated {} TicketBox demo events. Adjusted {} ON_SALE events to low-ticket inventory. Converted {} locked seats to sold and created {} confirmed demo bookings for {} seats",
                 createdCount,
                 updatedCount,
+                lowTicketAdjustedEvents,
                 bookingSyncResult.convertedLockedSeats(),
                 bookingSyncResult.createdBookings(),
                 bookingSyncResult.backfilledSeats()
@@ -218,6 +222,38 @@ public class DemoEventDataInitializer implements CommandLineRunner {
                 zone.getSeats().add(seat);
             }
         }
+    }
+
+    private int applyLowTicketDemoInventory(List<Event> events) {
+        return events.stream()
+                .filter(event -> event.getStatus() == Event.Status.ON_SALE)
+                .sorted(Comparator.comparing(Event::getStartTime))
+                .limit(LOW_TICKET_EVENT_COUNT)
+                .mapToInt(this::applyLowTicketDemoInventory)
+                .sum();
+    }
+
+    private int applyLowTicketDemoInventory(Event event) {
+        List<Seat> availableSeats = event.getZones().stream()
+                .flatMap(zone -> zone.getSeats().stream())
+                .filter(seat -> seat.getStatus() == Seat.Status.AVAILABLE)
+                .sorted(Comparator
+                        .comparing((Seat seat) -> seat.getZone().getId())
+                        .thenComparing(Seat::getRowNumber)
+                        .thenComparing(Seat::getColNumber))
+                .toList();
+
+        int totalSeats = event.getZones().stream()
+                .mapToInt(zone -> zone.getSeats().size())
+                .sum();
+        int desiredRemainingSeats = Math.max(1, totalSeats * LOW_TICKET_REMAINING_PERCENT / 100);
+        int seatsToSell = Math.max(0, availableSeats.size() - desiredRemainingSeats);
+
+        availableSeats.stream()
+                .limit(seatsToSell)
+                .forEach(seat -> seat.setStatus(Seat.Status.SOLD));
+
+        return seatsToSell > 0 ? 1 : 0;
     }
 
     private DemoBookingSyncResult syncDemoBookings(List<Event> events) {
