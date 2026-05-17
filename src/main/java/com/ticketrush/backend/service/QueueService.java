@@ -264,6 +264,8 @@ public class QueueService {
                 grantBatch(eventId);
             } catch (NumberFormatException e) {
                 log.warn("processQueue: Key Redis không hợp lệ: {}", key);
+            } catch (RuntimeException e) {
+                log.error("processQueue: Không thể xử lý queue key {}", key, e);
             }
         });
     }
@@ -275,41 +277,61 @@ public class QueueService {
 
         if (batch == null || batch.isEmpty()) return;
 
-        batch.forEach(tokenObj -> {
+        int grantedCount = 0;
+        for (Object tokenObj : batch) {
             String token = tokenObj.toString();
 
-            redisTemplate.opsForValue().set(
-                    grantedKey(token), "1",
-                    Duration.ofMinutes(grantedTtlMinutes));
-            redisTemplate.opsForSet().add(grantedEventKey(eventId), token);
-            redisTemplate.expire(grantedEventKey(eventId), Duration.ofMinutes(grantedTtlMinutes));
-
-            redisTemplate.opsForZSet().remove(queueKey(eventId), token);
-
-            Optional<QueueToken> grantedToken = queueTokenRepository.findByToken(token);
-            grantedToken.ifPresent(qt -> {
-                qt.setStatus(QueueToken.Status.GRANTED);
-                qt.setGrantedAt(LocalDateTime.now());
-                queueTokenRepository.save(qt);
-            });
-            if (grantedToken.isPresent()) {
-                QueueStatusMessage message = QueueStatusMessage.builder()
-                        .eventId(eventId)
-                        .status("GRANTED")
-                        .position(0)
-                        .totalInQueue(getQueueSize(eventId))
-                        .estimatedWaitSeconds(0)
-                        .build();
-                messagingTemplate.convertAndSendToUser(
-                        grantedToken.get().getUser().getEmail(),
-                        "/queue/queue/" + eventId,
-                        message);
+            try {
+                grantToken(eventId, token);
+                grantedCount++;
+            } catch (RuntimeException e) {
+                log.error("grantBatch: Không thể grant token={} eventId={}", token, eventId, e);
             }
+        }
 
-            log.info("Granted token={} eventId={}", token, eventId);
-        });
+        log.info("Granted {}/{} tokens for eventId={}", grantedCount, batch.size(), eventId);
 
         broadcastQueueUpdate(eventId);
+    }
+
+    private void grantToken(Integer eventId, String token) {
+        redisTemplate.opsForValue().set(
+                grantedKey(token), "1",
+                Duration.ofMinutes(grantedTtlMinutes));
+        redisTemplate.opsForSet().add(grantedEventKey(eventId), token);
+        redisTemplate.expire(grantedEventKey(eventId), Duration.ofMinutes(grantedTtlMinutes));
+
+        redisTemplate.opsForZSet().remove(queueKey(eventId), token);
+
+        Optional<QueueToken> grantedToken = queueTokenRepository.findByToken(token);
+        grantedToken.ifPresent(qt -> {
+            qt.setStatus(QueueToken.Status.GRANTED);
+            qt.setGrantedAt(LocalDateTime.now());
+            queueTokenRepository.save(qt);
+        });
+
+        if (grantedToken.isEmpty()) {
+            log.warn("Granted Redis token={} for eventId={} but DB token was not found", token, eventId);
+            return;
+        }
+
+        QueueStatusMessage message = QueueStatusMessage.builder()
+                .eventId(eventId)
+                .status("GRANTED")
+                .position(0)
+                .totalInQueue(getQueueSize(eventId))
+                .estimatedWaitSeconds(0)
+                .build();
+        try {
+            messagingTemplate.convertAndSendToUser(
+                    grantedToken.get().getUser().getEmail(),
+                    "/queue/queue/" + eventId,
+                    message);
+        } catch (RuntimeException e) {
+            log.warn("Granted token={} eventId={} but failed to send websocket message", token, eventId, e);
+        }
+
+        log.info("Granted token={} eventId={}", token, eventId);
     }
 
     @Scheduled(fixedDelay = 30000)

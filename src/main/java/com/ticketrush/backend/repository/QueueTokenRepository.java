@@ -1,12 +1,14 @@
 package com.ticketrush.backend.repository;
 
 import com.ticketrush.backend.entity.QueueToken;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface QueueTokenRepository extends JpaRepository<QueueToken, Integer> {
+    @EntityGraph(attributePaths = "user")
     Optional<QueueToken> findByToken(String token);
 
     Optional<QueueToken> findByTokenAndUserIdAndEventId(String token, Integer userId, Integer eventId);
