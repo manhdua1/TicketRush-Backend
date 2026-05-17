@@ -162,7 +162,7 @@ public class StatsService {
 
     private boolean isLowTicketEvent(OnSaleLowTicketEventResponse response) {
         return response.getTotalTickets() > 0
-                && (long) response.getRemainingTickets() * 10 < response.getTotalTickets();
+                && (long) response.getRemainingTickets() * 30 < response.getTotalTickets();
     }
 
     private OnSaleLowTicketEventResponse buildLowTicketOnSaleEventResponse(Event event) {
