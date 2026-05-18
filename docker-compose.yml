@@ -39,3 +39,19 @@ services:
     image: redis:8.4.2-alpine3.22
     ports:
       - "6379:6379"
+
+  frontend:
+    image: ticketrush-frontend:latest
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
+        NEXT_PUBLIC_WEBSOCKET_URL: http://localhost:8080/ws
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - INTERNAL_API_BASE_URL=http://backend:8080
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+      - NEXT_PUBLIC_WEBSOCKET_URL=http://localhost:8080/ws
