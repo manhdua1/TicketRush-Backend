@@ -1,4 +1,8 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+const BROWSER_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+const SERVER_BASE_URL = process.env.INTERNAL_API_BASE_URL || BROWSER_BASE_URL;
+const BASE_URL =
+  typeof window === "undefined" ? SERVER_BASE_URL : BROWSER_BASE_URL;
 const WS_URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "http://localhost:8080/ws";
 
 export const API_ENDPOINTS = {
