@@ -1,6 +1,8 @@
 # Overview
 
-TicketRush Backend is a Spring Boot API for event discovery, ticket booking, virtual queue management, seat locking, ticket issuing, and admin analytics.
+TicketRush is a full-stack, Dockerized high-concurrency event ticketing platform built with Spring Boot, Next.js, MySQL, and Redis for INT3306 - Web Application Development @ VNU-UET.
+
+The system supports event discovery, real-time seat selection, temporary seat locking, virtual queueing for high-traffic events, ticket booking, QR-based ticket lookup, user profile management, and admin analytics. The backend exposes REST and WebSocket APIs, while the frontend provides the customer booking flow and the admin event management dashboard.
 
 # Main Features
 
